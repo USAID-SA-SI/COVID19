@@ -9,7 +9,7 @@ output: html_document
 This code was developed to check the quality of USAID South Africa's COVID-19 indicators
 ##Checks valid for July 2022 onwards & in this R script: 
 Check 1, Check 2, Check 3, Check 4, Check 5, Check 6, Check 8, Check 9a, Check 10, Check 11, Check 12, Check 13
-
+#NOTE THAT THE FOLLOWING UPDATES WILL BE MADE TO THIS SCRIPT BY 8.26: CODE TO AUTOMATICALLY APPEND TO EXISTING DQRT SPREADSHEETS
 ##Step 1: Installing Packages (ONE-TIME STEP)
 Install these packages the first time you run R on your computer. You do not need to run these everytime you open R.
 
@@ -146,7 +146,8 @@ df2<- PARTNER_TOOLS %>%  tidyr::gather(`Reporting Date`,`Value`, `31-Jul-22`:`31
 ##Step 6: Create data frames for each Level 1 Check and bind together
 ```{r}
 #Dataset to check missing
-check1<- df2 %>% 
+check1<- df2 %>%
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
   dplyr:: mutate(check = ifelse(is.na(Value), "Value is NA", "NO ISSUE")) %>% 
   dplyr::filter(`check`== "Value is NA") %>% 
   tidyr::unnest(Value) %>% 
@@ -156,6 +157,7 @@ check1<- df2 %>%
 
 #Dataset to check 0
 check2<- df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
   dplyr::mutate(`Value`= as.character(`Value`)) %>%
   tidyr::unnest(Value) %>% 
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
@@ -175,6 +177,7 @@ Level1 <-  dplyr::bind_rows(check1, check2)
 
 #Dataset to check Unknown Sex == Male + Female
 check3<- df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
   dplyr::filter(`Dataelement Code`== "CV.1.3-3" | `Dataelement Code`== "CV.1.4-6" | `Dataelement Code`== "CV.1.4-7" | `Dataelement Code`==  "CV.1.4-8" | `Dataelement Code`==  "CV.2.1-12"| `Dataelement Code`==  "CV.2.2-13"| `Dataelement Code`==  "CV.2.3-15"| `Dataelement Code`==  "CV.2.4-18"| `Dataelement Code`==  "CV.2.5-20"| `Dataelement Code`==  "CV.1.9-1" | `Dataelement Code`==  "CV.1.9-2"| `Dataelement Code`==  "CV.1.9-3")   %>%
   dplyr::filter (`disagg category`== "Sex") %>% 
   tidyr::unnest(Value) %>% 
@@ -201,6 +204,7 @@ check3<- df2 %>%
 
 #Dataset to check if Sex <> Vaccine brand
 check4<- df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
   dplyr::filter(`Dataelement Code`== "CV.1.4-6" | `Dataelement Code`== "CV.1.4-7" | `Dataelement Code`==  "CV.1.4-8" | `Dataelement Code`==  "CV.1.9-1" | `Dataelement Code`==  "CV.1.9-2"| `Dataelement Code`==  "CV.1.9-3")   %>% 
   tidyr::unnest(Value) %>% 
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
@@ -227,6 +231,7 @@ check4<- df2 %>%
 
 #Dataset to check if same value reported for two or more of the disaggregate options
 check5 <-df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
    dplyr::filter(`Dataelement Code`== "CV.1.3-3" |`Dataelement Code`== "CV.1.4-5" | `Dataelement Code`== "CV.1.4-6" | `Dataelement Code`== "CV.1.4-7" | `Dataelement Code`==  "CV.1.4-8" | `Dataelement Code`==  "CV.2.1-11"|`Dataelement Code`==  "CV.2.1-12"| `Dataelement Code`==  "CV.2.2-13"| `Dataelement Code`==  "CV.2.3-15"| `Dataelement Code`==  "CV.2.4-18"| `Dataelement Code`==  "CV.2.5-20"|`Dataelement Code`==  "CV.2.6-22"| `Dataelement Code`==  "CV.1.9-1" | `Dataelement Code`==  "CV.1.9-2"| `Dataelement Code`==  "CV.1.9-3")    %>%  
    dplyr::mutate(id5=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Reporting Date`, sep= "_")) %>% 
   dplyr::mutate(`Value`= as.character(`Value`)) %>%
@@ -252,6 +257,7 @@ check5 <-df2 %>%
 
 #Dataset to check if same value reported for two or more districts or provinces
 check6 <-df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
     dplyr::filter(`Dataelement Code`== "CV.1.2-2" |`Dataelement Code`== "CV.1.3-3" |`Dataelement Code`== "CV.1.3-4" |`Dataelement Code`== "CV.1.4-5" | `Dataelement Code`== "CV.1.4-6" | `Dataelement Code`== "CV.1.4-7" | `Dataelement Code`==  "CV.1.4-8"| `Dataelement Code`==  "CV.2.2-13"| `Dataelement Code`==  "CV.2.3-15"|  `Dataelement Code`==  "CV.2.4-17"| `Dataelement Code`==  "CV.2.4-18"|  `Dataelement Code`==  "CV.2.5-19" |`Dataelement Code`==  "CV.2.5-20"|`Dataelement Code`==  "CV.2.5-21"| `Dataelement Code`==  "CV.1.9-1" | `Dataelement Code`==  "CV.1.9-2"| `Dataelement Code`==  "CV.1.9-3") %>%   
    dplyr::mutate(id6=paste(`Dataelement Code`, `disagg category`,`Disaggregate`, `Reporting Date`, sep= "_")) %>% 
   dplyr::group_by(id6, Value) %>% 
@@ -342,6 +348,7 @@ check10 <-df2 %>%
 
 #Dataset to check if Sex <> Training
 check11<- df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
   dplyr::filter(`Dataelement Code`==  "CV.2.5-20") %>% 
   tidyr::unnest(Value) %>% 
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
@@ -368,6 +375,7 @@ check11<- df2 %>%
 
 #Dataset to check if Sex <> Work Cadre
 check12<- df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
   dplyr::filter(`Dataelement Code`==  "CV.2.4-18") %>% 
   tidyr::unnest(Value) %>% 
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
@@ -394,6 +402,7 @@ check12<- df2 %>%
 
 #Dataset to check if Severity of event <>Type of USG support
 check13<- df2 %>% 
+  dplyr::filter(`Reporting Date` == "2022-07-31")%>%  #UPDATE DATE
   dplyr::filter(`Dataelement Code`==  "CV.1.5-9") %>% 
   tidyr::unnest(Value) %>% 
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
@@ -420,6 +429,7 @@ check13<- df2 %>%
 
 #Bind level 2 checks into 1 dataset
 Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, check11,check12, check13) 
+# NOTE that if checks are blank, you can exclude them from bind, as character types may cause issues (i.e. July 2022 only had a flag in check 6, so below I only included that in the bind)
 
 #where there are flags for July 2022
 Level2<-bind_rows(check6)
@@ -504,4 +514,6 @@ ADAPT_wb<- openxlsx::loadWorkbook("ADAPT_COVID-19 DQRT Tracker.xlsx")
 #write_excel_csv(Level1, paste0("SA_COVID19_LEVEL1_DataVal_DataQual_", format(Sys.time(), "%d-%b-%Y"), ".csv"))
 #write_excel_csv(Level2, paste0("SA_COVID19_LEVEL2_DataVal_DataQual_", format(Sys.time(), "%d-%b-%Y"), ".csv"))
 
+##TO AUTOMATICALLY APPEND TO EXISITNG DQRT TRACKERS:
+     #COMING SOON!
 ```
