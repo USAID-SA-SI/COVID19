@@ -15,7 +15,7 @@ library(janitor)
 # devtools::install_github("USAID-OHA-SI/gagglr")
 
 # SET CREDENTIALS & GLOBALS
-myuser<-("gsarfaty_SA")
+myuser<-()
 set_email()
 load_secrets()
 #after this step copy and paste into the R profile script and save
