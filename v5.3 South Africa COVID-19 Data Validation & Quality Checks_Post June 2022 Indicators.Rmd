@@ -46,18 +46,7 @@ install.packages("here")
 
 ```
 
-##Step 2: Authenticate Google Drive (ONE-TIME STEP)
-```{r}
-set_email("vdacosta@usaid.gov") #CHANGE TO YOUR EMAIL ADDRESS
-load_secrets()
-#after this step copy and paste into the R profile script and save
-#now stored so don't have to authenticate
-drive_auth()
-gs4_auth()
-
-```
-
-##Step 3: Running Libraries (EVERY TIME STEP)
+##Step 2: Running Libraries (EVERY TIME STEP)
 Run these packages everytime you open R. The code is depedent on these pacakges.
 
 ```{r}
@@ -87,6 +76,17 @@ library(googlesheets4)
 
 
 
+
+```
+
+##Step 3: Authenticate Google Drive (ONE-TIME STEP)
+```{r}
+set_email("vdacosta@usaid.gov") #CHANGE TO YOUR EMAIL ADDRESS
+load_secrets()
+#after this step copy and paste into the R profile script and save
+#now stored so don't have to authenticate
+drive_auth()
+gs4_auth()
 
 ```
 ##Step 4: Read in datasets using google drive (EVERY TIME STEP)
@@ -215,8 +215,8 @@ check4<- df2 %>%
   dplyr::select(-c(id4)) %>% 
   dplyr::distinct() %>% 
   tidyr::spread(key=`disagg category`, value=Value) %>% 
-#  dplyr::mutate_at(vars("Vaccine brand"), ~replace_na(.,0)) %>% 
- # dplyr::mutate_at(vars("Sex"), ~replace_na(.,0)) %>% 
+  dplyr::mutate_at(vars("Vaccine brand"), ~replace_na(.,0)) %>% 
+  dplyr::mutate_at(vars("Sex"), ~replace_na(.,0)) %>% 
   dplyr::mutate(`Vaccine brand`= as.numeric(`Vaccine brand`)) %>% 
   dplyr::mutate(`Sex`= as.numeric(`Sex`)) %>% 
   dplyr:: mutate(check = ifelse(`Sex`==`Vaccine brand`, "NO ISSUE", "Sex <> Vaccine brand")) %>%
