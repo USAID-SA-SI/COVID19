@@ -15,7 +15,7 @@ library(janitor)
 # devtools::install_github("USAID-OHA-SI/gagglr")
 
 # SET CREDENTIALS & GLOBALS
-myuser<-()
+myuser<-("gsarfaty_SA")
 set_email()
 load_secrets()
 #after this step copy and paste into the R profile script and save
@@ -23,7 +23,7 @@ load_secrets()
 drive_auth()
 gs4_auth()
 
-current_mo_full<-"2022-07-31"
+current_mo_full<-"2022-06-30"
 
 
 
@@ -170,12 +170,13 @@ arpa<-bind_rows(numeric,y_n) %>%
          value2=value) %>%
   spread(indicator2,value2) %>%
   clean_psnu() %>% 
-  mutate(last_refreshed=paste0(Sys.Date()))
+  mutate(last_refreshed=paste0(Sys.Date()),
+         historic_indicator_code=indicator_code)
 
 
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX.txt",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_historic.txt",sep="_")
 
 
 write_tsv(arpa, file.path(here("Dataout"),filename),na="")
