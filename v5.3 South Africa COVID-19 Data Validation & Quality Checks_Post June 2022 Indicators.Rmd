@@ -1,7 +1,7 @@
 ---
 title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 2022 indicators"
 author: "Vanessa Da Costa"
-date: "last updated 8/19/2022"
+date: "last updated 9/19/2022"
 output: html_document 
 ---
 
@@ -428,7 +428,10 @@ check13<- df2 %>%
 
 #Bind level 2 checks into 1 dataset
 Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, check11,check12, check13) %>% 
-  dplyr::select('Partner',	'OrgUnit',	'Data element',	'Dataelement Code',	'Original Dataelement Code',	'NumDenom',	'disagg category',	'Disaggregate',	'Start Date',	'End date',	'Indicator Status',	'Reporting Date',		'uniqueid',	'check',	'check_guidance',	'check_num',	'Sex',	'Vaccine brand',	'Value',	'value_prev_month',	'Percent_change',	'Training',	'Work cadre',	'Severity of event',	'Type of USG support') #MUST be in this order so it appends to the googlesheet.
+  dplyr::select('Partner',	'OrgUnit',	'Data element',	'Dataelement Code',	'Original Dataelement Code',	'NumDenom',	'disagg category',	'Disaggregate',	'Start Date',	'End date',	'Indicator Status',	'Reporting Date',		'uniqueid',	'check',	'check_guidance',	'check_num',	'Sex',	'Vaccine brand',	'Value',	'value_prev_month',	'Percent_change',	'Training',	'Work cadre',	'Severity of event',	'Type of USG support') %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>% dplyr::mutate(`value_prev_month`= as.numeric(`value_prev_month`)) %>% 
+  mutate(Percent_change= ifelse(is.finite(Percent_change), Percent_change, NA)) 
+  #MUST be in this order so it appends to the googlesheet.
 
 ```
 
