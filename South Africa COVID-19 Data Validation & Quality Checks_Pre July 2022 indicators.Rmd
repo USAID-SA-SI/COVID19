@@ -1,0 +1,615 @@
+---
+title: "South Africa COVID-19 Data Validation & Quality Checks-Pre July 2022 indicators"
+author: "Vanessa Da Costa"
+date: "last updated 7/18/2022"
+output: html_document 
+---
+
+##Purpose:
+This code was developed to check the quality of USAID South Africa's COVID-19 indicators
+
+##Step 1: Installing Packages (ONE-TIME STEP)
+Install these packages the first time you run R on your computer. You do not need to run these everytime you open R.
+
+```{r}
+install.packages("devtools")
+install.packages("googledrive")
+install.packages("gargle")
+install.packages("googlesheets4")
+devtools::install_github("USAID-OHA-SI/glamr", build_vignettes = TRUE)
+vignette("credential-management", package = "glamr")
+install.packages("validate")
+install.packages("flextable")
+install.packages("plyr")
+install.packages("rmarkdown")
+install.packages("stringr")
+install.packages("dplyr")
+install.packages("tidyverse")
+install.packages("tidyr")
+install.packages("readr")
+install.packages("readxl")
+install.packages("glamr")
+install.packages("purrr")
+install.packages("data.table")
+install.packages("splitstackshape")
+install.packages("gophr")
+install.packages("keyring")
+install.packages("fs")
+install.packages("readxl")
+install.packages("lubridate")
+install.packages("glue")
+install.packages("validate")
+install.packages("plyr")
+install.packages("here")
+
+```
+
+##Step 2: Authenticate Google Drive (ONE-TIME STEP)
+```{r}
+set_email("vdacosta@usaid.gov")
+load_secrets()
+#after this step copy and paste into the R profile script and save
+#now stored so don't have to authenticate
+drive_auth()
+gs4_auth()
+
+```
+
+##Step 3: Running Libraries (EVERY TIME STEP)
+Run these packages everytime you open R. The code is depedent on these pacakges.
+
+```{r}
+library(rmarkdown)
+library(stringr)
+library(dplyr)
+library(tidyverse)
+library(tidyr)
+library(readr)
+library(readxl)
+library(glamr)
+library(purrr)
+library(data.table)
+library(splitstackshape)
+library(gophr)
+library(keyring)
+library(fs)
+library(readxl)
+library(lubridate)
+library(glue)
+library(validate)
+library(plyr)
+library(here)
+library(googledrive)
+library(gargle)
+library(googlesheets4)
+
+
+
+
+```
+##Step 4: Read in datasets using google drive (EVERY TIME STEP)
+This section pulls from the live google sheets that partners update (files must be google sheets, cannot be XLSX file) 
+```{r}
+#Google Sheet (must be google sheet, cannot be XLSX file) 
+#This section pulls from the live google sheets that partners update
+ANOVA<-read_sheet(as_sheets_id('1d4O3gZwdD1qglk1FW442sYnoHQ9SBH6V60s09kEQrjs'), sheet = "Tracker")
+BROADREACH<-read_sheet(as_sheets_id('1y--S2IOsK-NDPpMKdHDz47LhWYipm2LSwF0hhCcFGXg'), sheet = "Tracker")
+GUIDEHOUSE<-read_sheet(as_sheets_id('1As-AVLcqhduKL0jA-c92D0vlO0gh1wIuumfMzYwNzo0'), sheet = "Tracker")
+GETF_NEXTMILE<-read_sheet(as_sheets_id('1WHdEzsyelf20N60JoP2ascrKQynDvaOEnfV3SRVcdBA'), sheet = "Tracker")
+EQUIP<-read_sheet(as_sheets_id('1-LMibRE6d3cF2ZUDsOQh3bE7VkNN8qfCr53iPw1GbqA'), sheet = "Tracker") #phase out after Dec 2021
+ADAPT_RTC <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "RTC") %>% 
+  dplyr::mutate(Sub = dplyr::recode(Sub, `N/A` = 'Right to Care')) %>%   #so RTC dataset aligns with others
+      mutate_if(is.list, as.character) %>% #tab not in correct format for bind
+      dplyr::mutate(`31-Jan-22`= as.logical(`31-Jan-22`)) %>%
+      dplyr::mutate(`28-Feb-22`= as.logical(`28-Feb-22`)) %>%
+      dplyr::mutate(`31-Mar-22`= as.logical(`31-Mar-22`)) %>%
+      dplyr::mutate(`30-Apr-22`= as.logical(`30-Apr-22`)) %>%
+      dplyr::mutate(`31-May-22`= as.logical(`31-May-22`)) %>%
+      dplyr::mutate(`30-Jun-22`= as.logical(`30-Jun-22`))
+
+ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum")
+
+ADAPT_FPD <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="FPD")
+
+ADAPT_Genesis <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Genesis")
+
+ADAPT_HE2RO <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="HE2RO")
+
+ADAPT_IHPS <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="IHPS")
+
+ADAPT_NICD <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="NICD")
+
+ADAPT_Qode <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Qode")
+
+ADAPT_ReAction <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="ReAction!")
+
+ADAPT_Stellenbosch <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Stellenbosch")
+
+ADAPT <-bind_rows(ADAPT_RTC,ADAPT_Aurum, ADAPT_FPD,ADAPT_Genesis,ADAPT_HE2RO,
+    ADAPT_IHPS,ADAPT_NICD,ADAPT_Qode,ADAPT_ReAction,ADAPT_Stellenbosch)%>%  
+    dplyr::rename(Partner= Sub) %>% 
+    dplyr::select(-c(Prime)) %>% 
+   mutate_if(is.logical, as.list) %>% 
+   mutate_if(is.numeric, as.list)
+
+PARTNER_TOOLS <-bind_rows(ANOVA,GUIDEHOUSE, GETF_NEXTMILE, ADAPT) 
+
+#archive PARTNER_TOOLS <-bind_rows(ANOVA,BROADREACH,GUIDEHOUSE, GETF_NEXTMILE, EQUIP, ADAPT) 
+
+
+```
+
+##Step 5: Restructure dataset so it's long and dates are in correct format
+```{r}
+df2<- PARTNER_TOOLS %>%  tidyr::gather(`Reporting Date`,`Value`, `31-Oct-21`:`31-Dec-23`) %>%  
+  
+#df2<- ADAPT %>%  tidyr::gather(`Reporting Date`,`Value`, `31-Jan-22`:`31-Dec-23`) %>%    
+
+  dplyr::mutate(`Reporting Date` =as.character(as.Date(`Reporting Date`, "%d-%b-%y"),"%d-%b-%y")) %>% 
+  dplyr::mutate(`Reporting Date` = as.Date(`Reporting Date`,"%d-%b-%y")) %>% 
+  #create unique ID so row with errors can be easily identified
+  dplyr::mutate(uniqueid=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Disaggregate`, `Reporting Date`, sep= "_")) 
+```
+
+##Step 6: Create data frames for each Level 1 Check and bind together
+```{r}
+
+#Dataset to check missing
+check1<- df2 %>% 
+   #dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+   dplyr::filter(`Dataelement Code`== "VACC_0.1" | `Dataelement Code`== "VACC_0.3" | `Dataelement Code`== "VACC_0.4" |`Dataelement Code`== "VACC_0.6" | `Dataelement Code`==  "VACC_0.8"|`Dataelement Code`==  "CASE_5.1"| `Dataelement Code`==  "CASE_5.2"|`Dataelement Code`==  "CASE_5.3"| `Dataelement Code`==  "CoOp_6.1" | `Dataelement Code`==  "IPC_4.1"| `Dataelement Code`==  "IPC_4.2"| `Dataelement Code`==  "IPC_4.3"| `Dataelement Code`==  "LAB_3.2"| `Dataelement Code`==  "RCCE_1.1"| `Dataelement Code`==  "RCCE_1.2"| `Dataelement Code`==  "SURV_2.1") %>% 
+  dplyr:: mutate(check = ifelse(is.na(Value), "Value is NA", "NO ISSUE")) %>% 
+  dplyr::filter(`check`== "Value is NA") %>% 
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(`check_guidance`="Review the 'Value' column") %>% 
+  dplyr::mutate(`check_num`="check1")
+
+#Dataset to check 0
+check2<- df2 %>% 
+  # dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.1" | `Dataelement Code`== "VACC_0.3" | `Dataelement Code`== "VACC_0.4" | `Dataelement Code`== "VACC_0.6" |`Dataelement Code`==  "CASE_5.1"| `Dataelement Code`==  "CASE_5.2" |`Dataelement Code`==  "CASE_5.3"| `Dataelement Code`==  "CoOp_6.1" | `Dataelement Code`==  "IPC_4.1"| `Dataelement Code`==  "IPC_4.2"| `Dataelement Code`==  "IPC_4.3"| `Dataelement Code`==  "LAB_3.2"| `Dataelement Code`==  "RCCE_1.1"| `Dataelement Code`==  "RCCE_1.2"| `Dataelement Code`==  "SURV_2.1") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(check = ifelse(`Value`==0, "VALUE IS 0", "NO ISSUE")) %>% 
+  dplyr::filter(`check`== "VALUE IS 0") %>%
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(`check_guidance`="Review the 'Value' column") %>% 
+  dplyr::mutate(`check_num`="check2")
+
+#Bind level 1 checks into 1 dataset
+Level1 <-  dplyr::bind_rows(check1, check2)
+
+```
+
+##Step 7: Create data frames for each Level 2 Check
+```{r}
+
+#Dataset to check Unknown Sex == Male + Female
+check3<- df2 %>% 
+   #  dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.1" | `Dataelement Code`== "VACC_0.3" | `Dataelement Code`== "VACC_0.4" | `Dataelement Code`==  "CASE_5.2" | `Dataelement Code`==  "IPC_4.2"| `Dataelement Code`==  "IPC_4.3"| `Dataelement Code`==  "LAB_3.2"| `Dataelement Code`==  "RCCE_1.2"| `Dataelement Code`==  "SURV_2.1")   %>% 
+  dplyr::filter (`disagg category`== "Sex") %>% 
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(id3=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`, sep= "_"))%>%
+  dplyr::select(-c(uniqueid)) %>% 
+  dplyr::group_by(id3,`Disaggregate`) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  tidyr::spread(key=Disaggregate, value=Value) %>% 
+  dplyr::mutate(`Reporting Date`= as.character(`Reporting Date`)) %>% 
+  dplyr::mutate(`Female`= as.numeric(`Female`)) %>% 
+  dplyr::mutate(`Male`= as.numeric(`Male`)) %>%
+  dplyr::mutate(`Unknown sex`= as.numeric(`Unknown sex`)) %>%
+  dplyr::mutate_at( dplyr::vars("Female"), ~ tidyr::replace_na(.,0)) %>% 
+  dplyr::mutate_at( dplyr::vars("Male"), ~   tidyr::replace_na(.,0)) %>% 
+  dplyr::mutate_at( dplyr::vars("Unknown sex"), ~tidyr::replace_na(.,0)) %>% 
+  dplyr::mutate(F_M_Total= Female + Male) %>% 
+  dplyr::mutate(check = ifelse(`Unknown sex`==F_M_Total &`Unknown sex` >0 , "Unknown Sex == Male + Female", "NO ISSUE")) %>% 
+ dplyr::filter(`check`== "Unknown Sex == Male + Female") %>% 
+  dplyr::mutate(`check_guidance`="Review the 'Unknown Sex'& 'F_M_Total' columns") %>% 
+  dplyr::mutate(`check_num`="check3") %>%
+  mutate(`Reporting Date` =as.Date(`Reporting Date`, origin="1899-12-30")) %>%  
+  dplyr::rename(uniqueid= id3)
+
+#Dataset to check if Sex <> Vaccine brand
+check4<- df2 %>% 
+   #  dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.1" |`Dataelement Code`== "VACC_0.4")   %>%
+  dplyr::filter(NumDenom != "Denominator") %>% 
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(id4=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`,`disagg category`, sep= "_")) %>% 
+  dplyr::select(-c(Disaggregate,uniqueid)) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::group_by(id4) %>% 
+  dplyr::mutate(`Value`= sum(`Value`)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(id4_2=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`, sep= "_")) %>%
+  dplyr::select(-c(id4)) %>% 
+  dplyr::distinct() %>% 
+  tidyr::spread(key=`disagg category`, value=Value) %>% 
+  dplyr::mutate_at(vars("Vaccine brand"), ~replace_na(.,0)) %>% 
+  dplyr::mutate_at(vars("Sex"), ~replace_na(.,0)) %>% 
+  dplyr::mutate(`Vaccine brand`= as.numeric(`Vaccine brand`)) %>% 
+  dplyr::mutate(`Sex`= as.numeric(`Sex`)) %>% 
+  dplyr:: mutate(check = ifelse(`Sex`==`Vaccine brand`, "NO ISSUE", "Sex <> Vaccine brand")) %>%
+  dplyr::filter(`check`== "Sex <> Vaccine brand") %>% #should the difference be +/- one because right now all errors are only a difference of 1
+    dplyr::mutate(`check_guidance`="Review the 'Sex'& 'Vaccine brand' columns") %>% 
+  dplyr::mutate(`check_num`="check4") %>% 
+  dplyr::rename(uniqueid= id4_2)
+
+
+#Dataset to check if same value reported for two or more of the disaggregate options
+
+check5 <-df2 %>% 
+     #  dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  filter(`Dataelement Code`== "VACC_0.1" | `Dataelement Code`== "VACC_0.3" | `Dataelement Code`== "VACC_0.4" | `Dataelement Code`== "VACC_0.6" |`Dataelement Code`==  "CASE_5.2" |`Dataelement Code`==  "CASE_5.3"|`Dataelement Code`==  "CoOp_6.1"| `Dataelement Code`==  "IPC_4.2"| `Dataelement Code`==  "IPC_4.3"| `Dataelement Code`==  "LAB_3.2" | `Dataelement Code`==  "RCCE_1.1"| `Dataelement Code`==  "RCCE_1.2"| `Dataelement Code`==  "SURV_2.1")  %>%  
+   dplyr::mutate(id5=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Reporting Date`, sep= "_")) %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  group_by(id5, Value) %>% 
+  dplyr::mutate(
+    count = row_number(), # Counts rows by group
+    check = count > 1 & Value >"0"    # TRUE if there is more than one row per group & if value doesn't equal 0
+  ) %>% 
+    dplyr::mutate(`check`= as.character(`check`)) %>%
+  mutate(check = recode(check, `TRUE` = 'Value reported in 2+ Disaggregate options', `FALSE` = 'NO ISSUE' )) %>% 
+  group_by(id5) %>% 
+  dplyr::filter(count== max(count)) %>% 
+  distinct(id5,count, .keep_all = TRUE) %>%
+  filter(`check`== "Value reported in 2+ Disaggregate options") %>% 
+  dplyr::select(-c(uniqueid, count)) %>% 
+  dplyr::mutate(`check_guidance`="Review the 'Value' & 'Disaggregate' column- check the other disaggregates in review for corresponding duplicate") %>% 
+  dplyr::mutate(`check_num`="check5") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  dplyr::filter(Value != "NULL") %>% 
+  dplyr::filter(Value != "NA") %>% 
+  dplyr::rename(uniqueid= id5)
+
+
+#Dataset to check if same value reported for two or more districts
+
+check6 <-df2 %>% 
+    #   dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.1" | `Dataelement Code`== "VACC_0.4" | `Dataelement Code`== "VACC_0.6" |`Dataelement Code`==  "CASE_5.1"|`Dataelement Code`==  "CASE_5.3"| `Dataelement Code`==  "IPC_4.1"| `Dataelement Code`==  "IPC_4.3"| `Dataelement Code`==  "LAB_3.2")    %>%  
+   dplyr::mutate(id6=paste(`Dataelement Code`, `disagg category`,`Disaggregate`, `Reporting Date`, sep= "_")) %>% 
+  dplyr::group_by(id6, Value) %>% 
+  dplyr::mutate(
+    count = dplyr::row_number(), # Counts rows by group
+    check   = count > 1 & Value >"0"   # TRUE if there is more than one row per group
+  ) %>%  #do we need to exclude values of 0 for this check?
+  dplyr::mutate(`check`= as.character(`check`)) %>%
+  dplyr::mutate(check = dplyr::recode(check, `TRUE` = 'Value reported in 2+ District options', `FALSE` = 'NO ISSUE' )) %>% 
+  dplyr::group_by(id6) %>% 
+  dplyr::filter(count== max(count)) %>% 
+  dplyr::distinct(id6,count, .keep_all = TRUE) %>%
+  dplyr::filter(`check`== "Value reported in 2+ District options") %>% 
+  dplyr::select(-c(uniqueid, count)) %>% 
+    dplyr::mutate(`check_guidance`="Review the 'Value' & 'District' column- check the other Districts in review for corresponding duplicate") %>% 
+  dplyr::mutate(`check_num`="check6") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  dplyr::filter(Value != "NULL") %>% 
+  dplyr::filter(Value != "NA") %>% 
+  dplyr::rename(uniqueid= id6)
+
+#Dataset to check if  N>D for VACC_0.3
+check7 <-df2 %>% 
+     #  dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.3" |`Dataelement Code`==  "CASE_5.2" | `Dataelement Code`==  "LAB_3.2" |`Dataelement Code`==  "SURV_2.1") %>% 
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(id7=paste(Partner, OrgUnit, `Dataelement Code`,`NumDenom`, `Reporting Date`, sep= "_"))%>%
+  dplyr::select(-c(Disaggregate,uniqueid, `disagg category`, `Data element`)) %>%
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::group_by(id7) %>% 
+  dplyr::mutate(`Value`= sum(`Value`)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(id7_2=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`, sep= "_")) %>%
+  dplyr::select(-c(id7)) %>% 
+  dplyr::distinct() %>% 
+  tidyr::spread(key=`NumDenom`, value=Value) %>% 
+  dplyr::mutate(`Numerator`= as.numeric(`Numerator`)) %>% 
+  dplyr::mutate(`Denominator`= as.numeric(`Denominator`)) %>%
+  dplyr::mutate_at( dplyr::vars("Numerator"), ~ tidyr::replace_na(.,0)) %>% 
+  dplyr::mutate_at( dplyr::vars("Denominator"), ~   tidyr::replace_na(.,0)) %>% 
+  dplyr::mutate(check = ifelse(`Numerator`> Denominator, "Numerator> Denominator", "NO ISSUE")) %>% 
+  dplyr::filter(`check`== "Numerator> Denominator") %>% 
+  dplyr::mutate(`check_guidance`="Review the 'Numerator' & 'Denominator' columns") %>% 
+  dplyr::mutate(`check_num`="check7") %>% 
+  dplyr::rename(uniqueid= id7_2)
+
+#Dataset to check if same value reported as previous month
+check8 <-df2 %>% 
+     #  dplyr::filter(`Reporting Date` == "2022-06-30" |`Reporting Date` == "2022-05-31" ) %>% #update this to current AND previous reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.1" | `Dataelement Code`== "VACC_0.3" | `Dataelement Code`== "VACC_0.4" | `Dataelement Code`== "VACC_0.6"  |`Dataelement Code`==  "CASE_5.1"| `Dataelement Code`==  "CASE_5.2" |`Dataelement Code`==  "CASE_5.3"| `Dataelement Code`==  "CoOp_6.1" | `Dataelement Code`==  "IPC_4.1"| `Dataelement Code`==  "IPC_4.2"| `Dataelement Code`==  "IPC_4.3"| `Dataelement Code`==  "LAB_3.2"| `Dataelement Code`==  "RCCE_1.1"| `Dataelement Code`==  "RCCE_1.2"| `Dataelement Code`==  "SURV_2.1") %>% 
+  dplyr::filter(NumDenom != "Denominator") %>% 
+  dplyr::mutate(id8=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Disaggregate`, sep= "_"))%>%
+  dplyr::select(-c(uniqueid)) %>%
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::arrange(id8, `Reporting Date`) %>% 
+  dplyr::group_by(id8) %>% 
+  #create a column for previously reported value
+  dplyr::mutate(value_prev_month = dplyr::lag(Value, n =1, default=NA)) %>% 
+# filter where the current and previous values are the same
+  dplyr::mutate(check = ifelse(value_prev_month==Value & Value >0, "Same Value Reported as Previous Month", "NO ISSUE")) %>% 
+  dplyr::filter(`check`== "Same Value Reported as Previous Month") %>%
+  dplyr::mutate(`check_guidance`="Review the 'Value' & 'value_prev_month' columns") %>% 
+  dplyr::mutate(`check_num`="check8") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  dplyr::mutate(`value_prev_month`= as.character(`value_prev_month`)) %>%
+  dplyr::rename(uniqueid= id8)
+
+  
+#Dataset to check if value changed from previous month for VACC 0.3 (numeric)
+check9a <-df2 %>% 
+      #   dplyr::filter(`Reporting Date` == "2022-06-30" |`Reporting Date` == "2022-05-31" ) %>% #update this to current AND previous reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.3" & NumDenom != "Numerator" | `Dataelement Code`== "LAB_3.2" & NumDenom != "Numerator" | `Dataelement Code`== "CASE_5.2" & NumDenom != "Numerator"| `Dataelement Code`== "RCCE_1.2" & NumDenom != "Denominator" | `Dataelement Code`== "SURV_2.1" & NumDenom != "Numerator") %>% 
+  dplyr::mutate(id9a=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Disaggregate`, sep= "_"))%>%
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::select(-c(uniqueid)) %>%
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::arrange(id9a, `Reporting Date`) %>% 
+  dplyr::group_by(id9a) %>% 
+  #create a column for previously reported value
+  dplyr::mutate(value_prev_month = dplyr::lag(Value, n =1, default=NA)) %>% 
+# filter where the current and previous values change
+  dplyr::mutate(check = ifelse(value_prev_month!= Value & Value >0, "Change from Previous Month", "NO ISSUE")) %>% 
+  dplyr::filter(`check`== "Change from Previous Month") %>% 
+  dplyr::mutate(`check_guidance`="Review the 'Value' & 'value_prev_month' columns") %>% 
+  dplyr::mutate(`check_num`="check9a") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  dplyr::mutate(`value_prev_month`= as.character(`value_prev_month`)) %>%
+  dplyr::rename(uniqueid= id9a)
+
+#Dataset to check if value changed from previous month for VACC 0.8 (text)
+check9b <-df2 %>% 
+       #    dplyr::filter(`Reporting Date` == "2022-06-30" |`Reporting Date` == "2022-05-31" ) %>% #update this to current AND previous reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.8") %>% 
+  dplyr::mutate(id9b=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Disaggregate`, sep= "_"))%>%
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  tidyr::unnest(Value) %>% 
+ # dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::select(-c(uniqueid)) %>%
+  dplyr::arrange(id9b, `Reporting Date`) %>% 
+  dplyr::group_by(id9b) %>% 
+  #create a column for previously reported value
+  dplyr::mutate(value_prev_month = dplyr::lag(Value, n =1)) %>% 
+  tidyr::drop_na(value_prev_month) %>% 
+# filter where the current and previous values change
+  dplyr::mutate(check = value_prev_month==Value) %>% 
+  dplyr::mutate(`check`= as.character(`check`)) %>% 
+  mutate(check = recode(check, `TRUE` = "NO ISSUE", `FALSE` ="Change from Previous Month")) %>% 
+  dplyr::mutate(`check`= as.character(`check`)) %>% 
+  dplyr::filter(`check`== "Change from Previous Month") %>%
+  dplyr::mutate(`check_guidance`="Review the 'Value' & 'value_prev_month' columns") %>% 
+  dplyr::mutate(`check_num`="check9b") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  dplyr::mutate(`value_prev_month`= as.character(`value_prev_month`)) %>%
+  dplyr::filter(`Value`!= "NA") %>%
+  dplyr::rename(uniqueid= id9b)
+
+#Dataset to check if value is numeric when should be # VACC 0.8 (text)
+check9c <-df2 %>% 
+   # dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "VACC_0.8") %>% 
+  dplyr::mutate(id9c=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Disaggregate`, sep= "_"))%>%
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  tidyr::unnest(Value) %>% 
+ dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::select(-c(uniqueid)) %>%
+  dplyr::arrange(id9c, `Reporting Date`) %>% 
+  dplyr::group_by(id9c) %>% 
+  dplyr::mutate(check = is.numeric(Value)) %>% 
+  dplyr::mutate(`check`= as.character(`check`)) %>% 
+  mutate(check = recode(check, `FALSE` = "NO ISSUE", `TRUE` ="Value is numeric not yes/no text")) %>% 
+  dplyr::filter(`check`== "Value is numeric not yes/no text") %>%
+  dplyr::mutate(`check_guidance`="Review the'Value'column") %>% 
+  dplyr::mutate(`check_num`="check9c") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  tidyr::drop_na(Value) %>% 
+  dplyr::rename(uniqueid= id9c)
+
+#Dataset to check if value changed from +/- 50% from previous reported value
+check10 <-df2 %>% 
+      #     dplyr::filter(`Reporting Date` == "2022-06-30" |`Reporting Date` == "2022-05-31" ) %>% #update this to current AND previous reporting month
+  dplyr::filter(NumDenom != "Denominator") %>% 
+  filter(`Dataelement Code`== "VACC_0.1" | `Dataelement Code`== "VACC_0.3" | `Dataelement Code`== "VACC_0.4" | `Dataelement Code`== "VACC_0.6" |`Dataelement Code`==  "CASE_5.1"| `Dataelement Code`==  "CASE_5.2"|`Dataelement Code`==  "CASE_5.3"| `Dataelement Code`==  "CoOp_6.1" | `Dataelement Code`==  "IPC_4.1"| `Dataelement Code`==  "IPC_4.2"| `Dataelement Code`==  "IPC_4.3"| `Dataelement Code`==  "LAB_3.2"| `Dataelement Code`==  "RCCE_1.1"| `Dataelement Code`==  "RCCE_1.2"| `Dataelement Code`==  "SURV_2.1") %>%  
+  dplyr::mutate(id10=paste(Partner, OrgUnit, `Dataelement Code`, `disagg category`, `Disaggregate`, sep= "_"))%>%
+   dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::select(-c(uniqueid)) %>%
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::arrange(id10, `Reporting Date`) %>% 
+  dplyr::group_by(id10) %>% 
+  #create a column for previously reported value
+  dplyr::mutate(value_prev_month = dplyr::lag(Value, n =1, default=NA)) %>% 
+  dplyr::mutate(Percent_change =(Value- value_prev_month)/value_prev_month) %>% 
+# filter where the current and previous values change
+  dplyr::mutate(check = ifelse(Percent_change>0.5  | Percent_change< -0.5, "+/- 50% Change from Previous Month", "NO ISSUE")) %>% 
+  dplyr::filter(`check`== "+/- 50% Change from Previous Month") %>%
+  dplyr::mutate(`check_guidance`="Review the'Value'm 'value_prev_month', & 'Percent_change' columns") %>% 
+  dplyr::mutate(`check_num`="check10") %>% 
+  dplyr::mutate(`Value`= as.character(`Value`)) %>%
+  dplyr::mutate(`value_prev_month`= as.character(`value_prev_month`)) %>%
+  dplyr::rename(uniqueid= id10)
+
+#Dataset to check if Sex <> Training
+check11<- df2 %>% 
+#  dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "CASE_5.2" & NumDenom != "Denominator") %>% 
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(id11=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`,`disagg category`, sep= "_")) %>% 
+  dplyr::select(-c(Disaggregate,uniqueid)) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::group_by(id11) %>% 
+  dplyr::mutate(`Value`= sum(`Value`)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(id11_2=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`, sep= "_")) %>%
+  dplyr::select(-c(id11)) %>% 
+  dplyr::distinct() %>% 
+  tidyr::spread(key=`disagg category`, value=Value) %>% 
+  dplyr::mutate_at(vars("Training"), ~replace_na(.,0)) %>% 
+  dplyr::mutate_at(vars("Sex"), ~replace_na(.,0)) %>% 
+  dplyr::mutate(`Training`= as.numeric(`Training`)) %>% 
+  dplyr::mutate(`Sex`= as.numeric(`Sex`)) %>% 
+  dplyr:: mutate(check = ifelse(`Sex`==`Training`, "NO ISSUE", "Sex <> Training")) %>%
+    dplyr::filter(`check`== "Sex <> Training") %>%
+    dplyr::mutate(`check_guidance`="Review the 'Sex'& 'Training' columns") %>% 
+  dplyr::mutate(`check_num`="check11") %>% 
+  dplyr::rename(uniqueid= id11_2)
+
+#Dataset to check if Sex <> Work Cadre
+check12<- df2 %>% 
+ #   dplyr::filter(`Reporting Date` == "2022-06-30") %>% #update this to current reporting month
+  dplyr::filter(`Dataelement Code`== "IPC_4.2" & NumDenom != "Denominator") %>% 
+  tidyr::unnest(Value) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::mutate(id12=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`,`disagg category`, sep= "_")) %>% 
+  dplyr::select(-c(Disaggregate,uniqueid)) %>% 
+  dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
+  dplyr::group_by(id12) %>% 
+  dplyr::mutate(`Value`= sum(`Value`)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(id12_2=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`, sep= "_")) %>%
+  dplyr::select(-c(id12)) %>% 
+  dplyr::distinct() %>% 
+  tidyr::spread(key=`disagg category`, value=Value) %>% 
+  dplyr::mutate_at(vars("Work cadre"), ~replace_na(.,0)) %>% 
+  dplyr::mutate_at(vars("Sex"), ~replace_na(.,0)) %>% 
+  dplyr::mutate(`Work cadre`= as.numeric(`Work cadre`)) %>% 
+  dplyr::mutate(`Sex`= as.numeric(`Sex`)) %>% 
+  dplyr:: mutate(check = ifelse(`Sex`==`Work cadre`, "NO ISSUE", "Sex <> Work cadre")) %>%
+  dplyr::filter(`check`== "Sex <> Work cadre") %>%
+  dplyr::mutate(`check_guidance`="Review the 'Sex'& 'Work cadre' columns") %>% 
+  dplyr::mutate(`check_num`="check12") %>% 
+  dplyr::rename(uniqueid= id12_2)
+
+
+
+#Bind level 2 checks into 1 dataset
+#if adapt included
+  Level2 <- bind_rows(check3, check4, check5, check6, check7, check8, check9a, check9b,check9c, check10, check11,check12) 
+  
+
+#if adapt excluded
+  Level2 <- bind_rows(check3, check4, check5, check6, check7, check8, check9a, check9b,check9c, check10)
+
+```
+
+##Step 8: Create separate partner files by level
+
+```{r}
+  Level1_ANOVA<-Level1 %>% 
+    dplyr::filter(`Partner`== "ANOVA")
+  Level2_ANOVA<-Level2 %>% 
+    dplyr::filter(`Partner`== "ANOVA")
+
+  Level1_GUIDEHOUSE<-Level1 %>% 
+    dplyr::filter(`Partner`== "Guidehouse")
+  Level2_GUIDEHOUSE<-Level2 %>% 
+    dplyr::filter(`Partner`== "Guidehouse")
+  
+  Level1_GETF_NEXTMILE<-Level1 %>% 
+    dplyr::filter(`Partner`== "GETF")
+  Level2_GETF_NEXTMILE<-Level2 %>% 
+    dplyr::filter(`Partner`== "GETF")
+  
+   Level1_ADAPT<-Level1 %>% 
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Foundation for Professional Development (FPD)"|`Partner`== "Genesis Analytics"|`Partner`== "Health Economics and Epidemiology Research Office (HE2RO)"|`Partner`== "Institute of Health Programs and Systems (IHPS)"|`Partner`== "National Institute for Communicable Diseases (NICD)"|`Partner`== "Qode Health Solutions"|`Partner`== "Re-Action!"|`Partner`== "UNIVERSITEIT STELLENBOSCH")
+   Level2_ADAPT<-Level2 %>% 
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Foundation for Professional Development (FPD)"|`Partner`== "Genesis Analytics"|`Partner`== "Health Economics and Epidemiology Research Office (HE2RO)"|`Partner`== "Institute of Health Programs and Systems (IHPS)"|`Partner`== "National Institute for Communicable Diseases (NICD)"|`Partner`== "Qode Health Solutions"|`Partner`== "Re-Action!"|`Partner`== "UNIVERSITEIT STELLENBOSCH")
+   
+##Tools that stopped implementation-optional to run##  
+    Level1_Broadreach<-Level1 %>% 
+    dplyr::filter(`Partner`== "Broadreach")
+  Level2_Broadreach<-Level2 %>% 
+    dplyr::filter(`Partner`== "Broadreach")
+  
+  Level1_EQUIP<-Level1 %>% 
+    dplyr::filter(`Partner`== "EQUIP")
+  Level2_EQUIP<-Level2 %>% 
+    dplyr::filter(`Partner`== "EQUIP")
+```
+
+
+##Step 9: Save results in existing Excel Workbook on desktop
+
+```{r}
+# https://ycphs.github.io/openxlsx/articles/Introduction.html
+  
+ANOVA_wb<- openxlsx::loadWorkbook("ANOVA_COVID-19 DQRT Tracker.xlsx") 
+
+  openxlsx::writeData(ANOVA_wb, sheet = "Level1", x = Level1_ANOVA, 
+          colNames=T, withFilter=T)
+  openxlsx::writeData(ANOVA_wb, sheet = "Level2", x = Level2_ANOVA, 
+          colNames=T, withFilter=T)
+  openxlsx::saveWorkbook(ANOVA_wb, "ANOVA_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
+  
+GUIDEHOUSE_wb<- openxlsx::loadWorkbook("GUIDEHOUSE_COVID-19 DQRT Tracker.xlsx") 
+  openxlsx::writeData(GUIDEHOUSE_wb, sheet = "Level1", 
+  x = Level1_GUIDEHOUSE, 
+  colNames=T, withFilter=T)
+  openxlsx::writeData(GUIDEHOUSE_wb, sheet = "Level2", 
+  x = Level2_GUIDEHOUSE, 
+  colNames=T, withFilter=T)
+  openxlsx::saveWorkbook(GUIDEHOUSE_wb, "GUIDEHOUSE_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
+
+GETF_NETXTMILE_wb<- openxlsx::loadWorkbook("GETF_COVID-19 DQRT Tracker.xlsx")
+  openxlsx::writeData(GETF_NETXTMILE_wb, sheet = "Level1", 
+  x =   Level1_GETF_NEXTMILE, 
+  colNames=T, withFilter=T)
+  openxlsx::writeData(GETF_NETXTMILE_wb, sheet = "Level2", 
+  x =   Level2_GETF_NEXTMILE, 
+  colNames=T, withFilter=T)
+  openxlsx::saveWorkbook(GETF_NETXTMILE_wb, "GETF_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
+  
+ADAPT_wb<- openxlsx::loadWorkbook("ADAPT_COVID-19 DQRT Tracker.xlsx") 
+  openxlsx::writeData(ADAPT_wb, sheet = "Level1", 
+  x =  Level1_ADAPT, 
+  colNames=T, withFilter=T)
+  openxlsx::writeData(ADAPT_wb, sheet = "Level2", 
+  x =  Level2_ADAPT, 
+  colNames=T, withFilter=T)
+  openxlsx::saveWorkbook( ADAPT_wb, "ADAPT_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
+
+##If need a master file-optional to run
+  wb<- openxlsx::loadWorkbook("MASTER_COVID-19 DQRT Tracker.xlsx") 
+  openxlsx::writeData(wb, sheet = "Level1", x = Level1, 
+          colNames=T, withFilter=T)
+  openxlsx::writeData(wb, sheet = "Level2", x = Level2, 
+          colNames=T, withFilter=T) 
+  openxlsx::saveWorkbook(wb, "MASTER_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
+  
+##Tools that stopped implementation-optional to run##  
+BROADREACH_wb<- openxlsx::loadWorkbook("BROADREACH_COVID-19 DQRT Tracker.xlsx")
+  openxlsx::writeData(BROADREACH_wb, sheet = "Level1",
+  x = Level1_Broadreach, 
+  colNames=T, withFilter=T)
+  openxlsx::writeData(BROADREACH_wb, sheet = "Level2", 
+  x = Level2_Broadreach, 
+  colNames=T, withFilter=T)
+  openxlsx::saveWorkbook(BROADREACH_wb, "BROADREACH_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
+  
+  
+EQUIP_wb<- openxlsx::loadWorkbook("EQUIP_COVID-19 DQRT Tracker.xlsx")
+  openxlsx::writeData(EQUIP_wb, sheet = "Level1", 
+  x = Level1_EQUIP, 
+  colNames=T, withFilter=T)
+  openxlsx::writeData(EQUIP_wb, sheet = "Level2", 
+  x = Level2_EQUIP, 
+  colNames=T, withFilter=T)
+  openxlsx::saveWorkbook(EQUIP_wb, "EQUIP_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
+ 
+
+##If needed To output to master CSV file directly
+#write_excel_csv(Level1, paste0("SA_COVID19_LEVEL1_DataVal_DataQual_", format(Sys.time(), "%d-%b-%Y"), ".csv"))
+#write_excel_csv(Level2, paste0("SA_COVID19_LEVEL2_DataVal_DataQual_", format(Sys.time(), "%d-%b-%Y"), ".csv"))
+
+```
