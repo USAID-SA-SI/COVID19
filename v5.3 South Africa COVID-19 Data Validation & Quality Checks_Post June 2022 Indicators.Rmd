@@ -1,7 +1,7 @@
 ---
 title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 2022 indicators"
 author: "Vanessa Da Costa"
-date: "last updated 9/19/2022"
+date: "last updated 9/26/2022"
 output: html_document 
 ---
 
@@ -94,38 +94,29 @@ This section pulls from the live google sheets that partners update (files must 
 ```{r}
 #Google Sheet (must be google sheet, cannot be XLSX file) 
 #This section pulls from the live google sheets that partners update
-ANOVA<-read_sheet(as_sheets_id('1d4O3gZwdD1qglk1FW442sYnoHQ9SBH6V60s09kEQrjs'), sheet = "Tracker v3", guess_max = 10000)
+     GUIDEHOUSE<-read_sheet(as_sheets_id('1As-AVLcqhduKL0jA-c92D0vlO0gh1wIuumfMzYwNzo0'), sheet = "Tracker v3", guess_max = 10000)
+     GETF_NEXTMILE<-read_sheet(as_sheets_id('1WHdEzsyelf20N60JoP2ascrKQynDvaOEnfV3SRVcdBA'), sheet = "Tracker v3", guess_max = 10000)
+     ADAPT_RTC <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "RTC_v3", guess_max = 10000)
+     ADAPT_ANOVA <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "ANOVA_v3", guess_max = 10000)
+     ADAPT_PulseHealth <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "PulseHealth_v3", guess_max = 10000)
+     ADAPT_Khethimpilo <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Khethimpilo_v3", guess_max = 10000)
+     ADAPT_WDED <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "WDED_v3", guess_max = 10000)
 
-GUIDEHOUSE<-read_sheet(as_sheets_id('1As-AVLcqhduKL0jA-c92D0vlO0gh1wIuumfMzYwNzo0'), sheet = "Tracker v3", guess_max = 10000)
+ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED)
 
-GETF_NEXTMILE<-read_sheet(as_sheets_id('1WHdEzsyelf20N60JoP2ascrKQynDvaOEnfV3SRVcdBA'), sheet = "Tracker v3", guess_max = 10000)
+PARTNER_TOOLS <-bind_rows(GUIDEHOUSE, GETF_NEXTMILE, ADAPT) 
 
-ADAPT_RTC <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "RTC_v3", guess_max = 10000)
-     
-ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum_v3", guess_max = 10000)
-
-ADAPT_FPD <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="FPD_v3", guess_max = 10000)
-
-ADAPT_Stellenbosch <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Stellenbosch_v3", guess_max = 10000)
-
-ADAPT_Genesis <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Genesis_v3", guess_max = 10000)
-
-ADAPT_INTRA <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="IntraHealth_v3", guess_max = 10000)
-
-ADAPT_IHPS <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="IHPS_v3", guess_max = 10000)
-
-ADAPT_Qode <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Qode_v3", guess_max = 10000)
-
-ADAPT_ReAction <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="ReAction!_v3", guess_max = 10000) 
-
-
-ADAPT <-bind_rows(ADAPT_RTC,ADAPT_Aurum, ADAPT_FPD,ADAPT_Genesis,ADAPT_INTRA,
-    ADAPT_IHPS,ADAPT_Qode,ADAPT_ReAction,ADAPT_Stellenbosch)
-
-
-PARTNER_TOOLS <-bind_rows(ANOVA,GUIDEHOUSE, GETF_NEXTMILE, ADAPT) 
-
-
+#INACTIVE googlesheets (do not run this section)   
+#ANOVA<-read_sheet(as_sheets_id('1d4O3gZwdD1qglk1FW442sYnoHQ9SBH6V60s09kEQrjs'), sheet = "Tracker v3", guess_max = 10000)
+#ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum_v3", guess_max = 10000)
+#ADAPT_FPD <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="FPD_v3", guess_max = 10000)
+#ADAPT_Stellenbosch <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Stellenbosch_v3", guess_max = 10000)
+#ADAPT_Genesis <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Genesis_v3", guess_max = 10000)
+#ADAPT_INTRA <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="IntraHealth_v3", guess_max = 10000)
+#ADAPT_IHPS <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="IHPS_v3", guess_max = 10000)
+#ADAPT_Qode <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Qode_v3", guess_max = 10000)
+#ADAPT_ReAction <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="ReAction!_v3", guess_max = 10000) 
+#ADAPT <-bind_rows(ADAPT_RTC,ADAPT_Aurum, ADAPT_FPD,ADAPT_Genesis,ADAPT_INTRA, ADAPT_IHPS,ADAPT_Qode,ADAPT_ReAction,ADAPT_Stellenbosch)
 
 ```
 
@@ -438,11 +429,6 @@ Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, ch
 ##Step 8: Create separate partner files by level
 
 ```{r}
-  Level1_ANOVA<-Level1 %>% 
-    dplyr::filter(`Partner`== "ANOVA")
-  Level2_ANOVA<-Level2 %>% 
-    dplyr::filter(`Partner`== "ANOVA")
-
   Level1_GUIDEHOUSE<-Level1 %>% 
     dplyr::filter(`Partner`== "Guidehouse")
   Level2_GUIDEHOUSE<-Level2 %>% 
@@ -454,22 +440,14 @@ Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, ch
     dplyr::filter(`Partner`== "GETF")
   
    Level1_ADAPT<-Level1 %>% 
-    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Foundation for Professional Development (FPD)"|`Partner`== "Genesis Analytics"|`Partner`== "Institute of Health Programs and Systems (IHPS)"|`Partner`== "IntraHealth"|`Partner`== "Qode Health Solutions"|`Partner`== "Re-Action!"|`Partner`== "UNIVERSITEIT STELLENBOSCH")
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo")
+    
    Level2_ADAPT<-Level2 %>% 
-        dplyr::filter(`Partner`== "Right to Care" |`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Foundation for Professional Development (FPD)"|`Partner`== "Genesis Analytics"|`Partner`== "Institute of Health Programs and Systems (IHPS)"|`Partner`== "IntraHealth"|`Partner`== "Qode Health Solutions"|`Partner`== "Re-Action!"|`Partner`== "UNIVERSITEIT STELLENBOSCH")
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo")
 ```
 
 ##Step 9a: PRECLEAN PERIOD ONLY: Automatically append PRECLEAN results to existing partner DQRT google spreadsheets. Note that if you rerun it mutliple tabs, it will update in the DQRT spreadsheets multiple times.
 ```{r}
-
-ANOVA_url_level1 <- "https://docs.google.com/spreadsheets/d/15fB-CoN_etdy9YOZ_IhGL8mePexudBj1eRXg1VrDho0/edit#gid=224915941"
-  ss_ANOVA_level1<-drive_get(ANOVA_url_level1)
-  ss_ANOVA_level1 %>% sheet_append(Level1_ANOVA, sheet = "Level1")
-
-ANOVA_url_level2 <- "https://docs.google.com/spreadsheets/d/15fB-CoN_etdy9YOZ_IhGL8mePexudBj1eRXg1VrDho0/edit#gid=210686588"
-  ss_ANOVA_level2<-drive_get(ANOVA_url_level2)
-  ss_ANOVA_level2 %>% sheet_append(Level2_ANOVA, sheet = "Level2")
-
 GUIDEHOUSE_url_level1 <- "https://docs.google.com/spreadsheets/d/16IXhexNBBboJNygo26-ImtkFvsLxzw6_loUQvzy4Q5A/edit#gid=1902024796"
   ss_GUIDEHOUSE_level1<-drive_get(GUIDEHOUSE_url_level1)
   ss_GUIDEHOUSE_level1 %>% sheet_append(Level1_GUIDEHOUSE, sheet = "Level1")
@@ -478,7 +456,7 @@ GUIDEHOUSE_url_level2 <- "https://docs.google.com/spreadsheets/d/16IXhexNBBboJNy
   ss_GUIDEHOUSE_level2<-drive_get(GUIDEHOUSE_url_level2)
   ss_GUIDEHOUSE_level2 %>% sheet_append(Level2_GUIDEHOUSE, sheet = "Level2")
 
-  GETF_NEXTMILE_url_level1 <- "https://docs.google.com/spreadsheets/d/1n_8PWl1cUKGi-8aACrsJW4GbcNAan7zvqEqdIyxmaG4/edit#gid=737504841"
+GETF_NEXTMILE_url_level1 <- "https://docs.google.com/spreadsheets/d/1n_8PWl1cUKGi-8aACrsJW4GbcNAan7zvqEqdIyxmaG4/edit#gid=737504841"
   ss_GETF_NEXTMILE_level1<-drive_get(GETF_NEXTMILE_url_level1)
   ss_GETF_NEXTMILE_level1 %>% sheet_append(Level1_GETF_NEXTMILE, sheet = "Level1")
 
@@ -486,7 +464,7 @@ GETF_NEXTMILE_url_level2 <- "https://docs.google.com/spreadsheets/d/1n_8PWl1cUKG
   ss_GETF_NEXTMILE_level2<-drive_get(GETF_NEXTMILE_url_level2)
   ss_GETF_NEXTMILE_level2 %>% sheet_append(Level2_GETF_NEXTMILE, sheet = "Level2")
 
-    ADAPT_url_level1 <- "https://docs.google.com/spreadsheets/d/1kodgE7uAQs91CDEgCPzKaV4KAkMZIDRtpaj4m2A3-Og/edit#gid=1471368329"
+ADAPT_url_level1 <- "https://docs.google.com/spreadsheets/d/1kodgE7uAQs91CDEgCPzKaV4KAkMZIDRtpaj4m2A3-Og/edit#gid=1471368329"
   ss_ADAPT_level1<-drive_get(ADAPT_url_level1)
   ss_ADAPT_level1 %>% sheet_append(Level1_ADAPT, sheet = "Level1")
 
@@ -515,14 +493,6 @@ ss_master_level2 %>% sheet_append(Level2, sheet = "Level2")
 
 ```{r}
 # https://ycphs.github.io/openxlsx/articles/Introduction.html
-  
-ANOVA_wb<- openxlsx::loadWorkbook("ANOVA_COVID-19 DQRT Tracker.xlsx") 
-
-  openxlsx::writeData(ANOVA_wb, sheet = "Level1", x = Level1_ANOVA, 
-          colNames=T, withFilter=T)
-  openxlsx::writeData(ANOVA_wb, sheet = "Level2", x = Level2_ANOVA, 
-          colNames=T, withFilter=T)
-  openxlsx::saveWorkbook(ANOVA_wb, "ANOVA_COVID-19 DQRT Tracker.xlsx", overwrite = TRUE)
   
 GUIDEHOUSE_wb<- openxlsx::loadWorkbook("GUIDEHOUSE_COVID-19 DQRT Tracker.xlsx") 
   openxlsx::writeData(GUIDEHOUSE_wb, sheet = "Level1", 
