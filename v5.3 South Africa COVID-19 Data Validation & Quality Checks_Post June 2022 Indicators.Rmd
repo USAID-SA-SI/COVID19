@@ -1,7 +1,7 @@
 ---
 title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 2022 indicators"
 author: "Vanessa Da Costa"
-date: "last updated 10/20/2022"
+date: "last updated 11/08/2022"
 output: html_document 
 ---
 
@@ -101,21 +101,21 @@ This section pulls from the live google sheets that partners update (files must 
      ADAPT_PulseHealth <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "PulseHealth_v3", guess_max = 10000)
      ADAPT_Khethimpilo <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Khethimpilo_v3", guess_max = 10000)
      ADAPT_WDED <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "WDED_v3", guess_max = 10000)
+    ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum_v3", guess_max = 10000)
+    ADAPT_ReAction <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="ReAction!_v3", guess_max = 10000) 
 
-ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED)
+ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED, ADAPT_Aurum, ADAPT_ReAction)
 
 PARTNER_TOOLS <-bind_rows(GUIDEHOUSE, GETF_NEXTMILE, ADAPT) 
 
 #INACTIVE googlesheets (do not run this section)
 #ANOVA<-read_sheet(as_sheets_id('1d4O3gZwdD1qglk1FW442sYnoHQ9SBH6V60s09kEQrjs'), sheet = "Tracker v3", guess_max = 10000)
-#ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum_v3", guess_max = 10000)
 #ADAPT_FPD <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="FPD_v3", guess_max = 10000)
 #ADAPT_Stellenbosch <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Stellenbosch_v3", guess_max = 10000)
 #ADAPT_Genesis <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Genesis_v3", guess_max = 10000)
 #ADAPT_INTRA <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="IntraHealth_v3", guess_max = 10000)
 #ADAPT_IHPS <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="IHPS_v3", guess_max = 10000)
 #ADAPT_Qode <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Qode_v3", guess_max = 10000)
-#ADAPT_ReAction <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="ReAction!_v3", guess_max = 10000) 
 #ADAPT <-bind_rows(ADAPT_RTC,ADAPT_Aurum, ADAPT_FPD,ADAPT_Genesis,ADAPT_INTRA, ADAPT_IHPS,ADAPT_Qode,ADAPT_ReAction,ADAPT_Stellenbosch)
 
 ```
@@ -441,10 +441,10 @@ Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, ch
     dplyr::filter(`Partner`== "GETF")
   
   Level1_ADAPT<-Level1 %>% 
-    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo")
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!")
     
   Level2_ADAPT<-Level2 %>% 
-    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo")
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!")
 ```
 
 ##Step 9a: PRECLEAN PERIOD ONLY: Automatically append PRECLEAN results to existing partner DQRT google spreadsheets. Note that if you rerun it mutliple tabs, it will update in the DQRT spreadsheets multiple times.
