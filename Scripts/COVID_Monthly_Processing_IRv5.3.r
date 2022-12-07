@@ -11,20 +11,25 @@ library(Wavelength)
 library(lubridate)
 library(here)
 library(janitor)
+library(glamr)
 
 # devtools::install_github("USAID-OHA-SI/gagglr")
 
 # SET CREDENTIALS & GLOBALS
-myuser<-()
-set_email()
+myuser<-("")
+set_email("")
 load_secrets()
 #after this step copy and paste into the R profile script and save
 #now stored so don't have to authenticate
 drive_auth()
 gs4_auth()
 
-current_mo_full<-"2022-07-31"
+current_mo_full<-"2022-10-31" #change each month
 
+
+# READ IN HISTORIC DATA
+historic<-read_tsv(here("Dataout","2022-06-30_Data_USAID_ARPA_GVAX_historic.txt")) %>% 
+  mutate(last_refreshed=as.character(last_refreshed))
 
 
 # EXTRACT FROM LIVE GOOGLE SHEET -----------------------------------------------
@@ -41,7 +46,9 @@ GETF_NEXTMILE<-read_sheet(as_sheets_id('1WHdEzsyelf20N60JoP2ascrKQynDvaOEnfV3SRV
   
 ADAPT_RTC <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "RTC_v3",
                        col_types="c") %>% 
-  rename(Prime=Partner)
+  rename(Prime=Partner) %>% 
+  mutate(Sub="Right to Care") %>% 
+  relocate(Sub,.after=Prime)
 
 
 ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum_v3",
@@ -67,9 +74,30 @@ ADAPT_ReAction <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJ
   rename(Sub=Partner)
 
 
+ADAPT_Anova <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="ANOVA_v3",
+                            col_types="c") %>% 
+  rename(Sub=Partner)
+
+
+ADAPT_PulseHealth <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="PulseHealth_v3",
+                         col_types="c") %>% 
+  rename(Sub=Partner)
+
+
+ADAPT_WDED <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="WDED_v3",
+                               col_types="c") %>% 
+  rename(Sub=Partner)
+
+
+ADAPT_KI <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="Khethimpilo_v3",
+                        col_types="c") %>% 
+  rename(Sub=Partner)
+
 
 ADAPT <-bind_rows(ADAPT_RTC,ADAPT_Aurum, ADAPT_FPD,
-                  ADAPT_Genesis,ADAPT_Intrahealth,ADAPT_ReAction)%>%  
+                  ADAPT_Genesis,ADAPT_Intrahealth,ADAPT_ReAction,
+                  ADAPT_Anova,ADAPT_PulseHealth, ADAPT_WDED,
+                  ADAPT_KI)%>%  
   rename(Partner=Prime) %>% 
   select(Partner,Sub,everything()) %>% 
   mutate(Partner="Right to Care")
@@ -143,28 +171,82 @@ arpa<-numeric %>%
   mutate(psnu=case_when(
     psnu=="IP-level" ~ "Data reported above PSNU level",
     TRUE ~ psnu)) %>% 
-  left_join(hierarchy, by="psnu") %>% 
+  left_join(hierarchy, by="psnu") %>%
+  # clean_psnu() %>% 
+  mutate(last_refreshed=paste0(Sys.Date())) %>% 
+  unite(ind_key,historic_indicator_code,numeratordenom,sep="_",remove=FALSE) %>% 
+  mutate(disaggregate=case_when(
+    indicator_code=="CV.1.4-5" & str_detect(disaggregate,"Community-based") ~ "Community-based outreach vaccination sites",
+    indicator_code=="CV.1.4-5" & str_detect(disaggregate,"transit team") ~ "Mobile team (or clinic) or transit team strategy",
+    indicator_code=="CV.1.1-1" & str_detect(disaggregate,"Hard copy") ~ "Hard Copy Print",
+    indicator_code=="CV.1.1-1" & str_detect(disaggregate,"Social") ~ "Social Media",
+    indicator_code=="CV.1.1-1" & str_detect(disaggregate,"Mobile") ~ "Mobile/Telephone",
+    TRUE ~ disaggregate
+  ))
+
+
+# IDENTIFY CLEAN INDICATOR NAMES
+indicator_names<-arpa %>% 
+  distinct(historic_indicator_code,indicator,numeratordenom) %>% 
+  filter(!historic_indicator_code=="N/A",
+         !indicator=="Number of policies, protocols, standards, or guidelines across any of the result areas\ndeveloped or adapted with USG support") %>% 
+  unite(ind_key,historic_indicator_code,numeratordenom,sep="_") %>% 
+  rename(indicator_clean=indicator) %>% 
+  mutate(indicator_clean=case_when(
+    ind_key=="RCCE_1.2_Numerator" ~ "Number of health workers and non-health workers trained on risk communication and community engagement (RCCE)",
+    ind_key=="CoOp_6.1_Numerator" ~ "Number of policies, protocols, standards, or guidelines across any of the result areas developed or adapted with USG support",
+    ind_key=="SURV_2.1_Numerator" ~ "Number of people trained on surveillance and/or rapid response (case investigation, contact tracing, and case finding) for COVID-19",
+    ind_key=="CASE_5.1_Numerator" ~ "Number of facilities receiving technical assistance for case management, such as facility-level assessments, guidance, and/or training",
+    ind_key=="IPC_4.1_Numerator" ~ "Number of health facilities where USG provided support for IPC and/or WASH for COVID-19",
+    TRUE ~ indicator_clean
+  ))
+
+
+# MAKE INDICATOR KEY IN HISTORIC FOR JOINING
+historic<-historic %>% 
+  unite(ind_key,historic_indicator_code,numeratordenom,sep="_",remove=FALSE) %>% 
+  left_join(indicator_names,by="ind_key")
+
+
+
+# BIND HISTORIC AND CURRENT DATA
+arpa_combined<-arpa %>% 
+  left_join(indicator_names,by="ind_key") %>% 
+  mutate(dis_code=indicator_code) %>% 
+  bind_rows(historic) %>% 
+  mutate(ageasentered="",
+         sex=case_when(
+           str_detect(standardizeddisaggregate,"Sex") ~ disaggregate,
+           TRUE ~ ""
+         ),
+         indicator=case_when(
+           is.na(indicator_clean) ~ indicator,
+           TRUE ~ indicator_clean
+         )) %>% 
+  select(-indicator_clean) %>% 
   mutate(indicator2=indicator,
          value2=value) %>%
-  spread(indicator2,value2) %>%
-  clean_psnu() %>% 
-  mutate(last_refreshed=paste0(Sys.Date()))
+  spread(indicator2,value2) 
 
 
+ind<-distinct(arpa_combined,historic_indicator_code,indicator,numeratordenom)
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX.txt",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.3.csv",sep="_")
 
 
-write_tsv(arpa, file.path(here("Dataout"),filename),na="")
+write_csv(arpa_combined, file.path(here("Dataout"),filename),na="")
 
 
 
 # EXPORT SUMMARY FILES
-summary<-arpa %>% 
-  group_by(prime_partner_name,indicator_code,
+summary<-arpa_combined%>% 
+  filter(period %in% c("FY22Q4",
+                       "FY23Q1")) %>% 
+  group_by(prime_partner_name,sub_partner,
+           dis_code,indicator_code,
            indicator,standardizeddisaggregate,
-           disaggregate,mon_yr) %>% 
+           disaggregate,mon_yr,period) %>% 
   summarize_at(vars(value),sum,na.rm=TRUE) %>% 
   ungroup() %>% 
   split_save(prime_partner_name,

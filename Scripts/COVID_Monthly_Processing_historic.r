@@ -15,8 +15,8 @@ library(janitor)
 # devtools::install_github("USAID-OHA-SI/gagglr")
 
 # SET CREDENTIALS & GLOBALS
-myuser<-()
-set_email()
+myuser<-("")
+set_email("")
 load_secrets()
 #after this step copy and paste into the R profile script and save
 #now stored so don't have to authenticate
@@ -45,7 +45,8 @@ EQUIP<-read_sheet(as_sheets_id('1-LMibRE6d3cF2ZUDsOQh3bE7VkNN8qfCr53iPw1GbqA'), 
   
   
 ADAPT_RTC <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "RTC",
-                       col_types="c")
+                       col_types="c") %>% 
+  mutate(Sub="Right to Care")
 
 
 ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum",
@@ -127,6 +128,11 @@ hierarchy<-pull_hierarchy("cDGPF739ZZr", myuser, askpass::askpass()) %>%
   filter(!is.na(psnu))
 
 
+#read in indicator x-walk
+indicators<-read_csv("C:/Users/STAR/Documents/COVID19/Data/indicator_codes.csv") %>% 
+  select(indicator_code,ind_key) %>% 
+  rename(dis_code=indicator_code)
+
 
 
 # COMBINE & CLEAN!
@@ -166,12 +172,12 @@ arpa<-bind_rows(numeric,y_n) %>%
     psnu=="IP-level" ~ "Data reported above PSNU level",
     TRUE ~ psnu)) %>% 
   left_join(hierarchy, by="psnu") %>% 
-  mutate(indicator2=indicator,
-         value2=value) %>%
-  spread(indicator2,value2) %>%
-  clean_psnu() %>% 
+  # clean_psnu() %>% 
   mutate(last_refreshed=paste0(Sys.Date()),
-         historic_indicator_code=indicator_code)
+         historic_indicator_code=indicator_code) %>% 
+  unite(ind_key,historic_indicator_code,numeratordenom,sep="_",remove=FALSE) %>% 
+  left_join(indicators,by="ind_key") %>% 
+  select(-indicator_code)
 
 
 
