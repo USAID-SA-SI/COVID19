@@ -13,9 +13,12 @@
 *.png
 *.twbx
 *.pptx
+*.hyper
 
 #nothing from these folders
 AI/*
 GIS/*
 Images/*
 Graphics/*
+Data/*
+Dataout/*
