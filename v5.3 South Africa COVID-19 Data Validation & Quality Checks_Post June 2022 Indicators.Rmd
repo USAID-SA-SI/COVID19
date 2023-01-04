@@ -1,7 +1,7 @@
 ---
-title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 2022 indicators"
+title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 indicators"
 author: "Vanessa Da Costa"
-date: "last updated 11/08/2022"
+date: "last updated 1/04/2023"
 output: html_document 
 ---
 
@@ -103,8 +103,9 @@ This section pulls from the live google sheets that partners update (files must 
      ADAPT_WDED <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "WDED_v3", guess_max = 10000)
     ADAPT_Aurum <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet = "Aurum_v3", guess_max = 10000)
     ADAPT_ReAction <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="ReAction!_v3", guess_max = 10000) 
-
-ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED, ADAPT_Aurum, ADAPT_ReAction)
+   ADAPT_HST <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="HST_v3", guess_max = 10000)
+   ADAPT_THINK <-read_sheet(as_sheets_id('1k2yDUZk49SRjTq3ceeXzogUw1TnMszjdXGtYJFwW060'), sheet="THINK_v3", guess_max = 10000)
+ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED, ADAPT_Aurum, ADAPT_ReAction, ADAPT_HST, ADAPT_THINK)
 
 PARTNER_TOOLS <-bind_rows(GUIDEHOUSE, GETF_NEXTMILE, ADAPT) 
 
@@ -441,10 +442,9 @@ Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, ch
     dplyr::filter(`Partner`== "GETF")
   
   Level1_ADAPT<-Level1 %>% 
-    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!")
-    
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!" |`Partner`== "HST" |`Partner`== "THINK")
   Level2_ADAPT<-Level2 %>% 
-    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!")
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!"|`Partner`== "HST" |`Partner`== "THINK")
 ```
 
 ##Step 9a: PRECLEAN PERIOD ONLY: Automatically append PRECLEAN results to existing partner DQRT google spreadsheets. Note that if you rerun it mutliple tabs, it will update in the DQRT spreadsheets multiple times.
