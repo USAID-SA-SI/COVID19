@@ -46,7 +46,8 @@ GETF_NEXTMILE<-read_sheet(as_sheets_id('1WHdEzsyelf20N60JoP2ascrKQynDvaOEnfV3SRV
   
 ADAPT_RTC <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "RTC_v3",
                        col_types="c") %>% 
-  rename(Prime=Partner) %>% 
+  rename(Prime=Partner,
+         OrgUnit=`Org Unit`) %>% 
   mutate(Sub="Right to Care") %>% 
   relocate(Sub,.after=Prime)
 
@@ -111,7 +112,26 @@ ADAPT <-bind_rows(ADAPT_RTC,ADAPT_Aurum, ADAPT_FPD,
                   ADAPT_KI, ADAPT_HST,ADAPT_THINK)%>%  
   rename(Partner=Prime) %>% 
   select(Partner,Sub,everything()) %>% 
-  mutate(Partner="Right to Care")
+  mutate(Partner="Right to Care",
+         Disaggregate=case_when(
+           Disaggregate=="60+ male" ~ "60+, male",
+           TRUE ~ Disaggregate)
+         ) %>% 
+  separate(Disaggregate, into=c("ageasentered","sex"),
+           sep=",", remove=FALSE, convert=TRUE, fill="right") %>% 
+  mutate(ageasentered=case_when(
+    `disagg category`=="Age/Sex" ~ ageasentered,
+    TRUE ~ ""),
+    sex=case_when(
+      `disagg category`=="Age/Sex" ~ sex,
+      `disagg category`=="Sex" ~ Disaggregate,
+      TRUE ~ ""
+    ),
+    sex=case_when(
+      sex==" male" ~ "Male",
+      sex==" female" ~ "Female",
+      TRUE ~ sex
+    ))
 
   
   
@@ -225,12 +245,11 @@ arpa_combined<-arpa %>%
   left_join(indicator_names,by="ind_key") %>% 
   mutate(dis_code=indicator_code) %>% 
   bind_rows(historic) %>% 
-  mutate(ageasentered="",
-         sex=case_when(
-           str_detect(standardizeddisaggregate,"Sex") ~ disaggregate,
-           TRUE ~ ""
-         ),
-         indicator=case_when(
+  mutate(sex=case_when(
+    standardizeddisaggregate=="Sex" ~ disaggregate,
+    standardizeddisaggregate=="Age/Sex" ~ sex,
+    TRUE ~ ""),
+    indicator=case_when(
            is.na(indicator_clean) ~ indicator,
            TRUE ~ indicator_clean
          )) %>% 
@@ -240,10 +259,11 @@ arpa_combined<-arpa %>%
   spread(indicator2,value2) 
 
 
+
 ind<-distinct(arpa_combined,historic_indicator_code,indicator,numeratordenom)
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v2.0.csv",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v3.0.csv",sep="_")
 
 
 write_csv(arpa_combined, file.path(here("Dataout"),filename),na="")
