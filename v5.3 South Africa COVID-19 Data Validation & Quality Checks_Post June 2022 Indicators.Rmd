@@ -1,7 +1,7 @@
 ---
 title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 indicators"
 author: "Vanessa Da Costa"
-date: "last updated 1/31/2023 w/ new age/sex & modality checks and updated sheet ids for ADAPT tool"
+date: "last updated 2/01/2023 w/ new age/sex & modality checks and updated sheet ids for ADAPT tool"
 output: html_document 
 ---
 
@@ -434,21 +434,21 @@ check14<- df2 %>%
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
   tidyr::spread(key=Disaggregate, value=Value) %>% 
   dplyr::mutate(`Reporting Date`= as.character(`Reporting Date`)) %>% 
-  dplyr::mutate(`<12, female`= as.numeric(`<12, female`)) %>% 
+  dplyr::mutate(`< 12, female`= as.numeric(`< 12, female`)) %>% 
   dplyr::mutate(`12-17, female`= as.numeric(`12-17, female`)) %>%
   dplyr::mutate(`18-34, female`= as.numeric(`18-34, female`)) %>%
   dplyr::mutate(`35-49, female`= as.numeric(`35-49, female`)) %>%
   dplyr::mutate(`50-59, female`= as.numeric(`50-59, female`)) %>%
   dplyr::mutate(`60+, female`= as.numeric(`60+, female`)) %>%
   dplyr::mutate(`unknown, female`= as.numeric(`unknown, female`)) %>%
-  dplyr::mutate_at( dplyr::vars("<12, female"), ~ tidyr::replace_na(.,0)) %>% 
+  dplyr::mutate_at( dplyr::vars("< 12, female"), ~ tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("12-17, female"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("18-34, female"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("35-49, female"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("50-59, female"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("60+, female"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("unknown, female"), ~tidyr::replace_na(.,0)) %>% 
-  dplyr::mutate(F_Total= `<12, female` + `12-17, female`  +
+  dplyr::mutate(F_Total= `< 12, female` + `12-17, female`  +
              `18-34, female` + `35-49, female` + `50-59, female` + `60+, female` ) %>% 
   dplyr::mutate(check = ifelse(`unknown, female`==F_Total &`unknown, female` >0 , "Unknown Female == All Female", "NO ISSUE")) %>% 
   dplyr::filter(`check`== "Unknown Female == All Female") %>% 
@@ -463,7 +463,7 @@ check15<- df2 %>%
   dplyr::filter(`Dataelement Code`==  "CV.1.4-6" |`Dataelement Code`==  "CV.1.4-7" |`Dataelement Code`==  "CV.1.4-8" | `Dataelement Code`==  "CV.1.9-1"  | `Dataelement Code`==  "CV.1.9-2"  | `Dataelement Code`==  "CV.1.9-3" ) %>% 
   dplyr::filter(`Partner`!=  "Guidehouse"|`Partner`!=  "GETF" ) %>% #only for ADAPT
   dplyr::filter (`disagg category`== "Age/Sex") %>% 
-    dplyr::filter(grepl('male', Disaggregate)) %>% 
+    dplyr::filter(grepl(' male', Disaggregate)) %>% 
   tidyr::unnest(Value) %>% 
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>%
   dplyr::mutate(id15=paste(Partner, OrgUnit, `Dataelement Code`, `Reporting Date`, sep= "_"))%>%
@@ -477,17 +477,17 @@ check15<- df2 %>%
   dplyr::mutate(`18-34, male`= as.numeric(`18-34, male`)) %>%
   dplyr::mutate(`35-49, male`= as.numeric(`35-49, male`)) %>%
   dplyr::mutate(`50-59, male`= as.numeric(`50-59, male`)) %>%
-  dplyr::mutate(`60+, male`= as.numeric(`60+, male`)) %>%
+  dplyr::mutate(`60+, male`= as.numeric(`60+ male`)) %>%
   dplyr::mutate(`unknown, male`= as.numeric(`unknown, male`)) %>%
   dplyr::mutate_at( dplyr::vars("<12, male"), ~ tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("12-17, male"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("18-34, male"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("35-49, male"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("50-59, male"), ~   tidyr::replace_na(.,0)) %>% 
-  dplyr::mutate_at( dplyr::vars("60+, male"), ~   tidyr::replace_na(.,0)) %>% 
+  dplyr::mutate_at( dplyr::vars("60+ male"), ~   tidyr::replace_na(.,0)) %>% 
   dplyr::mutate_at( dplyr::vars("unknown, male"), ~tidyr::replace_na(.,0)) %>% 
   dplyr::mutate(M_Total= `<12, male` + `12-17, male`  +
-             `18-34, male` + `35-49, male` + `50-59, male` + `60+, male` ) %>% 
+             `18-34, male` + `35-49, male` + `50-59, male` + `60+ male` ) %>% 
   dplyr::mutate(check = ifelse(`unknown, male`==M_Total &`unknown, male` >0 , "Unknown Male == All Male", "NO ISSUE")) %>% 
   dplyr::filter(`check`== "Unknown Male == All Male") %>% 
   dplyr::mutate(`check_guidance`="Review the 'Unknown Male & 'M_Total' columns") %>% 
@@ -553,7 +553,7 @@ check17<- df2 %>%
   
 #Bind level 2 checks into 1 dataset
 Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, check11,check12, check13, check14, check15, check16, check17) %>% 
-  dplyr::select('Partner',	'OrgUnit',	'Data element',	'Dataelement Code',	'Original Dataelement Code',	'NumDenom',	'disagg category',	'Disaggregate',	'Start Date',	'End date',	'Indicator Status',	'Reporting Date',		'uniqueid',	'check',	'check_guidance',	'check_num',	'Sex',	'Vaccine brand',	'Value',	'value_prev_month',	'Percent_change',	'Training',	'Work cadre',	'Severity of event',	'Type of USG support', 'Age/Sex', 'Modality') %>% 
+  dplyr::select('Partner',	'OrgUnit',	'Data element',	'Dataelement Code',	'Original Dataelement Code',	'NumDenom',	'disagg category',	'Disaggregate',	'Start Date',	'End date',	'Indicator Status',	'Reporting Date',		'uniqueid',	'check',	'check_guidance',	'check_num', 'Female', 'Male', 'Unknown sex', 'F_M_Total',	'Sex', 'unknown, female', 'F_Total', 'unknown, male', 'M_Total',  'Age/Sex',	'Vaccine brand','Modality',	'Value',	'value_prev_month',	'Percent_change',	'Training',	'Work cadre',	'Severity of event',	'Type of USG support') %>% 
   dplyr::mutate(`Value`= as.numeric(`Value`)) %>% dplyr::mutate(`value_prev_month`= as.numeric(`value_prev_month`)) %>% 
   mutate(Percent_change= ifelse(is.finite(Percent_change), Percent_change, NA)) 
   #MUST be in this order so it appends to the googlesheet.
@@ -627,7 +627,7 @@ ss_master_level2 %>% sheet_append(Level2, sheet = "Level2")
 ##Step 9c OPTIONAL/IF ISSUE WITH A and B: Save results in existing Excel Workbook on desktop
 
 ```{r}
-# https://ycphs.github.io/openxlsx/articles/Introduction.html
+# Blank templates can be found here: https://drive.google.com/drive/folders/1iaSLvrRBLiERshUmBnruuDCjfzt8xR_-
   
 GUIDEHOUSE_wb<- openxlsx::loadWorkbook("GUIDEHOUSE_COVID-19 DQRT Tracker.xlsx") 
   openxlsx::writeData(GUIDEHOUSE_wb, sheet = "Level1", 
