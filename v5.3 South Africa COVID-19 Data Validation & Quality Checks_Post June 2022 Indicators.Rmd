@@ -1,7 +1,7 @@
 ---
 title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 indicators"
 author: "Vanessa Da Costa"
-date: "last updated 2/01/2023 w/ new age/sex & modality checks and updated sheet ids for ADAPT tool"
+date: "last updated 2/13/2023 w/ new age/sex & modality checks and updated sheet ids for ADAPT tool & new v2 of all tools"
 output: html_document 
 ---
 
@@ -94,17 +94,18 @@ This section pulls from the live google sheets that partners update (files must 
 ```{r}
 #Google Sheet (must be google sheet, cannot be XLSX file) 
 #This section pulls from the live google sheets that partners update
-     GUIDEHOUSE<-read_sheet(as_sheets_id('1As-AVLcqhduKL0jA-c92D0vlO0gh1wIuumfMzYwNzo0'), sheet = "Tracker v3", guess_max = 10000)
-     GETF_NEXTMILE<-read_sheet(as_sheets_id('1WHdEzsyelf20N60JoP2ascrKQynDvaOEnfV3SRVcdBA'), sheet = "Tracker v3", guess_max = 10000)
-     ADAPT_RTC <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "RTC_v3", guess_max = 10000)
-     ADAPT_ANOVA <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "ANOVA_v3", guess_max = 10000)
-     ADAPT_PulseHealth <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "PulseHealth_v3", guess_max = 10000)
-     ADAPT_Khethimpilo <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "Khethimpilo_v3", guess_max = 10000)
-     ADAPT_WDED <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "WDED_v3", guess_max = 10000)
-    ADAPT_Aurum <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "Aurum_v3", guess_max = 10000)
-    ADAPT_ReAction <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="ReAction!_v3", guess_max = 10000) 
-   ADAPT_HST <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="HST_v3", guess_max = 10000)
-   ADAPT_THINK <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="THINK_v3", guess_max = 10000)
+##All links updated 2/13/2023
+     GUIDEHOUSE<-read_sheet(as_sheets_id('1GGHPZGu3FjBhdtCu7-kgiATXmunkkdezLRxuHRTPI-s'), sheet = "Tracker v3", guess_max = 10000)
+     GETF_NEXTMILE<-read_sheet(as_sheets_id('1xDCQkg2ZJOZMrGdQ8IEfLnuuoRhBKmGjP1UQ00FbxWc'), sheet = "Tracker v3", guess_max = 10000)
+     ADAPT_RTC <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "RTC_v3", guess_max = 10000)
+     ADAPT_ANOVA <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "ANOVA_v3", guess_max = 10000)
+     ADAPT_PulseHealth <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "PulseHealth_v3", guess_max = 10000)
+     ADAPT_Khethimpilo <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "Khethimpilo_v3", guess_max = 10000)
+     ADAPT_WDED <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "WDED_v3", guess_max = 10000)
+    ADAPT_Aurum <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "Aurum_v3", guess_max = 10000)
+    ADAPT_ReAction <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="ReAction!_v3", guess_max = 10000) 
+   ADAPT_HST <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="HST_v3", guess_max = 10000)
+   ADAPT_THINK <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="THINK_v3", guess_max = 10000)
 ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED, ADAPT_Aurum, ADAPT_ReAction, ADAPT_HST, ADAPT_THINK)
 
 PARTNER_TOOLS <-bind_rows(GUIDEHOUSE, GETF_NEXTMILE, ADAPT) 
