@@ -252,20 +252,38 @@ arpa_combined<-arpa %>%
            is.na(indicator_clean) ~ indicator,
            TRUE ~ indicator_clean
          )) %>% 
-  select(-indicator_clean) %>% 
+  select(-indicator_clean)
+
+
+# Sex/Aggregated for Vax Indicators then combine for final
+final_df<-arpa_combined %>% 
+  filter(dis_code %in% c("CV.1.4-6","CV.1.4-7","CV.1.4-8",
+                               "CV.1.9-1","CV.1.9-2","CV.1.9-3"),
+         standardizeddisaggregate %in% c("Sex","Age/Sex")) %>% 
+  mutate(standardizeddisaggregate=case_when(
+    mon_yr < "2022-12" & standardizeddisaggregate=="Sex" ~ "Sex Aggregated",
+    mon_yr >= "2022-12" & standardizeddisaggregate=="Age/Sex" ~ "Sex Aggregated",
+    TRUE ~ ""
+  ),
+  disaggregate=case_when(
+    mon_yr >= "2022-12" ~ sex,
+    TRUE ~ disaggregate
+  )) %>% 
+  filter(!standardizeddisaggregate=="") %>% 
+  bind_rows(arpa_combined) %>% 
   mutate(indicator2=indicator,
          value2=value) %>%
   spread(indicator2,value2) 
 
 
 
-ind<-distinct(arpa_combined,historic_indicator_code,indicator,numeratordenom)
+ind<-distinct(final_df,historic_indicator_code,indicator,numeratordenom)
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.0.csv",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.3.csv",sep="_")
 
 
-write_csv(arpa_combined, file.path(here("Dataout"),filename),na="")
+write_csv(final_df, file.path(here("Dataout"),filename),na="")
 
 
 
