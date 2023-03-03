@@ -16,15 +16,15 @@ library(glamr)
 # devtools::install_github("USAID-OHA-SI/gagglr")
 
 # SET CREDENTIALS & GLOBALS
-myuser<-()
-set_email()
+myuser<-("gsarfaty_SA")
+set_email("gsarfaty@usaid.gov")
 load_secrets()
 #after this step copy and paste into the R profile script and save
 #now stored so don't have to authenticate
 drive_auth()
 gs4_auth()
 
-current_mo_full<-"2022-12-31" #change each month
+current_mo_full<-"2023-01-31" #change each month to be the most recent month of data
 
 
 # READ IN HISTORIC DATA
@@ -37,68 +37,67 @@ ANOVA<-read_sheet(as_sheets_id('1d4O3gZwdD1qglk1FW442sYnoHQ9SBH6V60s09kEQrjs'), 
                   col_types="c")
 
 
-GUIDEHOUSE<-read_sheet(as_sheets_id('1As-AVLcqhduKL0jA-c92D0vlO0gh1wIuumfMzYwNzo0'), sheet = "Tracker v3",
+GUIDEHOUSE<-read_sheet(as_sheets_id('1GGHPZGu3FjBhdtCu7-kgiATXmunkkdezLRxuHRTPI-s'), sheet = "Tracker v3",
                        col_types="c")
 
-GETF_NEXTMILE<-read_sheet(as_sheets_id('1WHdEzsyelf20N60JoP2ascrKQynDvaOEnfV3SRVcdBA'), sheet = "Tracker v3",
+GETF_NEXTMILE<-read_sheet(as_sheets_id('1xDCQkg2ZJOZMrGdQ8IEfLnuuoRhBKmGjP1UQ00FbxWc'), sheet = "Tracker v3",
                           col_types="c") 
 
   
-ADAPT_RTC <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "RTC_v3",
+ADAPT_RTC <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "RTC_v3",
                        col_types="c") %>% 
-  rename(Prime=Partner,
-         OrgUnit=`Org Unit`) %>% 
+  rename(Prime=Partner) %>% 
   mutate(Sub="Right to Care") %>% 
   relocate(Sub,.after=Prime)
 
 
-ADAPT_Aurum <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet = "Aurum_v3",
+ADAPT_Aurum <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "Aurum_v3",
                          col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_FPD <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="FPD_v3",
+ADAPT_FPD <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="FPD_v3",
                        col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_Genesis <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="Genesis_v3",
+ADAPT_Genesis <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="Genesis_v3",
                            col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_Intrahealth <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="IntraHealth_v3",
+ADAPT_Intrahealth <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="IntraHealth_v3",
                         col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_ReAction <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="ReAction!_v3",
+ADAPT_ReAction <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="ReAction!_v3",
                             col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_Anova <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="ANOVA_v3",
+ADAPT_Anova <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="ANOVA_v3",
                             col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_PulseHealth <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="PulseHealth_v3",
+ADAPT_PulseHealth <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="PulseHealth_v3",
                          col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_WDED <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="WDED_v3",
+ADAPT_WDED <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="WDED_v3",
                                col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_KI <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="Khethimpilo_v3",
+ADAPT_KI <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="Khethimpilo_v3",
                         col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_HST <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="HST_v3",
+ADAPT_HST <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="HST_v3",
                       col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_THINK <-read_sheet(as_sheets_id('1v-5xHU9aK59miudKSyY8WLQRZgpaCEZMk-42GXnGWJQ'), sheet="THINK_v3",
+ADAPT_THINK <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="THINK_v3",
                           col_types="c") %>% 
   rename(Sub=Partner)
 
@@ -253,33 +252,51 @@ arpa_combined<-arpa %>%
            is.na(indicator_clean) ~ indicator,
            TRUE ~ indicator_clean
          )) %>% 
-  select(-indicator_clean) %>% 
+  select(-indicator_clean)
+
+
+# Sex/Aggregated for Vax Indicators then combine for final
+final_df<-arpa_combined %>% 
+  filter(dis_code %in% c("CV.1.4-6","CV.1.4-7","CV.1.4-8",
+                               "CV.1.9-1","CV.1.9-2","CV.1.9-3"),
+         standardizeddisaggregate %in% c("Sex","Age/Sex")) %>% 
+  mutate(standardizeddisaggregate=case_when(
+    mon_yr < "2022-12" & standardizeddisaggregate=="Sex" ~ "Sex Aggregated",
+    mon_yr >= "2022-12" & standardizeddisaggregate=="Age/Sex" ~ "Sex Aggregated",
+    TRUE ~ ""
+  ),
+  disaggregate=case_when(
+    mon_yr >= "2022-12" ~ sex,
+    TRUE ~ disaggregate
+  )) %>% 
+  filter(!standardizeddisaggregate=="") %>% 
+  bind_rows(arpa_combined) %>% 
   mutate(indicator2=indicator,
          value2=value) %>%
   spread(indicator2,value2) 
 
 
 
-ind<-distinct(arpa_combined,historic_indicator_code,indicator,numeratordenom)
+ind<-distinct(final_df,historic_indicator_code,indicator,numeratordenom)
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v3.0.csv",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.3.csv",sep="_")
 
 
-write_csv(arpa_combined, file.path(here("Dataout"),filename),na="")
+write_csv(final_df, file.path(here("Dataout"),filename),na="")
 
 
 
 # EXPORT SUMMARY FILES
-summary<-arpa_combined%>% 
-  filter(period %in% c("FY22Q4",
-                       "FY23Q1")) %>% 
-  group_by(prime_partner_name,sub_partner,
-           dis_code,indicator_code,
-           indicator,standardizeddisaggregate,
-           disaggregate,mon_yr,period) %>% 
-  summarize_at(vars(value),sum,na.rm=TRUE) %>% 
-  ungroup() %>% 
-  split_save(prime_partner_name,
-             here("Dataout"),
-             paste0(current_mo_full,"Summary Data"))
+# summary<-arpa_combined%>% 
+#   filter(period %in% c("FY22Q4",
+#                        "FY23Q1")) %>% 
+#   group_by(prime_partner_name,sub_partner,
+#            dis_code,indicator_code,
+#            indicator,standardizeddisaggregate,
+#            disaggregate,mon_yr,period) %>% 
+#   summarize_at(vars(value),sum,na.rm=TRUE) %>% 
+#   ungroup() %>% 
+#   split_save(prime_partner_name,
+#              here("Dataout"),
+#              paste0(current_mo_full,"Summary Data"))
