@@ -1,6 +1,6 @@
 ---
 title: "South Africa COVID-19 Data Validation & Quality Checks-Post June 2022 indicators"
-author: "Vanessa Da Costa"
+author: "Deborah Kortso COllison"
 date: "last updated 2/13/2023 w/ new age/sex & modality checks and updated sheet ids for ADAPT tool & new v2 of all tools"
 output: html_document 
 ---
@@ -81,7 +81,7 @@ library(googlesheets4)
 
 ##Step 3: Authenticate Google Drive (ONE-TIME STEP)
 ```{r}
-set_email("vdacosta@usaid.gov") #CHANGE TO YOUR EMAIL ADDRESS
+set_email("dcollison@usaid.gov") #CHANGE TO YOUR EMAIL ADDRESS
 load_secrets()
 #after this step copy and paste into the R profile script and save
 #now stored so don't have to authenticate
@@ -105,8 +105,10 @@ This section pulls from the live google sheets that partners update (files must 
     ADAPT_Aurum <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "Aurum_v3", guess_max = 10000)
     ADAPT_ReAction <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="ReAction!_v3", guess_max = 10000) 
    ADAPT_HST <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="HST_v3", guess_max = 10000)
-   ADAPT_THINK <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="THINK_v3", guess_max = 10000)
-ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED, ADAPT_Aurum, ADAPT_ReAction, ADAPT_HST, ADAPT_THINK)
+   ADAPT_THINK <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="THINK_v3",guess_max = 10000)
+   ADAPT_BRHC <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="BRHC_v3" ,  guess_max = 10000)
+   ADAPT_SHF <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="SHF_v3" ,  guess_max = 10000)
+ADAPT <-bind_rows(ADAPT_RTC,ADAPT_ANOVA, ADAPT_PulseHealth, ADAPT_Khethimpilo, ADAPT_WDED, ADAPT_Aurum, ADAPT_ReAction, ADAPT_HST, ADAPT_THINK, ADAPT_BRHC, ADAPT_SHF)
 
 PARTNER_TOOLS <-bind_rows(GUIDEHOUSE, GETF_NEXTMILE, ADAPT) 
 
@@ -576,9 +578,9 @@ Level2 <- bind_rows(check3, check4, check5, check6, check8, check9a, check10, ch
     dplyr::filter(`Partner`== "GETF")
   
   Level1_ADAPT<-Level1 %>% 
-    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!" |`Partner`== "HST" |`Partner`== "THINK")
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!" |`Partner`== "HST" |`Partner`== "THINK" |`Partner`== "BRHC"|`Partner`== "SHF")
   Level2_ADAPT<-Level2 %>% 
-    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!"|`Partner`== "HST" |`Partner`== "THINK")
+    dplyr::filter(`Partner`== "Right to Care" |`Partner`== "WDED"|`Partner`== "Pulse Health"|`Partner`== "ANOVA"|`Partner`== "Kheth’impilo"|`Partner`== "THE AURUM INSTITUTE"|`Partner`== "Re-Action!"|`Partner`== "HST" |`Partner`== "THINK"|`Partner`== "BRHC"|`Partner`== "SHF")
 ```
 
 ##Step 9a: PRECLEAN PERIOD ONLY: Automatically append PRECLEAN results to existing partner DQRT google spreadsheets. Note that if you rerun it mutliple tabs, it will update in the DQRT spreadsheets multiple times.
