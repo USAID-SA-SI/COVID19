@@ -16,7 +16,7 @@ library(here)
 library(janitor)
 library(glamr)
 
-# devtools::install_github("USAID-OHA-SI/gagglr")
+# devtools::install_github("USAID-OHA-SI/Wavelength")
 
 # SET CREDENTIALS & GLOBALS
 myuser<-("gsarfaty_SA")
@@ -27,7 +27,7 @@ load_secrets()
 drive_auth()
 gs4_auth()
 
-current_mo_full<-"2023-01-31" #change each month to be the most recent month of data
+current_mo_full<-"2023-03-31" #change each month to be the most recent month of data
 
 
 # READ IN HISTORIC DATA
@@ -105,13 +105,18 @@ ADAPT_THINK <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3y
   rename(Sub=Partner)
 
 
+ADAPT_BR <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="BRHC_v3",
+                         col_types="c") %>% 
+  rename(Sub=Partner)
 
-
+ADAPT_SHF <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="SHF_v3",
+                      col_types="c") %>% 
+  rename(Sub=Partner)
 
 ADAPT <-bind_rows(ADAPT_RTC,ADAPT_Aurum, ADAPT_FPD,
                   ADAPT_Genesis,ADAPT_Intrahealth,ADAPT_ReAction,
                   ADAPT_Anova,ADAPT_PulseHealth, ADAPT_WDED,
-                  ADAPT_KI, ADAPT_HST,ADAPT_THINK)%>%  
+                  ADAPT_KI, ADAPT_HST,ADAPT_THINK,ADAPT_BR,ADAPT_SHF)%>%  
   rename(Partner=Prime) %>% 
   select(Partner,Sub,everything()) %>% 
   mutate(Partner="Right to Care",
@@ -283,7 +288,7 @@ final_df<-arpa_combined %>%
 ind<-distinct(final_df,historic_indicator_code,indicator,numeratordenom)
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.3.csv",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.2.csv",sep="_")
 
 
 write_csv(final_df, file.path(here("Dataout"),filename),na="")
