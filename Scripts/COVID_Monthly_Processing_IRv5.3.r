@@ -27,7 +27,7 @@ load_secrets()
 drive_auth()
 gs4_auth()
 
-current_mo_full<-"2023-03-31" #change each month to be the most recent month of data
+current_mo_full<-"2023-04-30" #change each month to be the most recent month of data
 
 
 # READ IN HISTORIC DATA
@@ -288,7 +288,7 @@ final_df<-arpa_combined %>%
 ind<-distinct(final_df,historic_indicator_code,indicator,numeratordenom)
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.2.csv",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.0.csv",sep="_")
 
 
 write_csv(final_df, file.path(here("Dataout"),filename),na="")
