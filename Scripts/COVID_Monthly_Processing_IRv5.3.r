@@ -19,15 +19,15 @@ library(glamr)
 # devtools::install_github("USAID-OHA-SI/Wavelength")
 
 # SET CREDENTIALS & GLOBALS
-myuser<-("gsarfaty_SA")
-set_email("gsarfaty@usaid.gov")
+myuser<-("ctrapencepretoria_ia")
+set_email("ctrapence@usaid.gov")
 load_secrets()
 #after this step copy and paste into the R profile script and save
 #now stored so don't have to authenticate
 drive_auth()
 gs4_auth()
 
-current_mo_full<-"2023-04-30" #change each month to be the most recent month of data
+current_mo_full<-"2023-07-30" #change each month to be the most recent month of data
 
 
 # READ IN HISTORIC DATA
@@ -87,7 +87,7 @@ ADAPT_PulseHealth <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXE
   rename(Sub=Partner)
 
 
-ADAPT_WDED <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="WDED_v3",
+ ADAPT_WDED <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="WDED_v3",
                                col_types="c") %>% 
   rename(Sub=Partner)
 
