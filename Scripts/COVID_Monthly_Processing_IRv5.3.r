@@ -15,19 +15,20 @@ library(lubridate)
 library(here)
 library(janitor)
 library(glamr)
+library(stringr)
 
 # devtools::install_github("USAID-OHA-SI/Wavelength")
 
 # SET CREDENTIALS & GLOBALS
 myuser<-("ctrapencepretoria_ia")
 set_email("ctrapence@usaid.gov")
-load_secrets()
+#load_secrets()
 #after this step copy and paste into the R profile script and save
 #now stored so don't have to authenticate
-drive_auth()
-gs4_auth()
+#drive_auth()
+#gs4_auth()
 
-current_mo_full<-"2023-07-30" #change each month to be the most recent month of data
+current_mo_full<-"2023-08-31" #change each month to be the most recent month of data
 
 
 # READ IN HISTORIC DATA
@@ -47,69 +48,69 @@ GETF_NEXTMILE<-read_sheet(as_sheets_id('1xDCQkg2ZJOZMrGdQ8IEfLnuuoRhBKmGjP1UQ00F
                           col_types="c") 
 
   
-ADAPT_RTC <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "RTC_v3",
+ADAPT_RTC <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet = "RTC_v3",
                        col_types="c") %>% 
   rename(Prime=Partner) %>% 
   mutate(Sub="Right to Care") %>% 
   relocate(Sub,.after=Prime)
 
 
-ADAPT_Aurum <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet = "Aurum_v3",
+ADAPT_Aurum <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet = "Aurum_v3",
                          col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_FPD <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="FPD_v3",
+ADAPT_FPD <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="FPD_v3",
                        col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_Genesis <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="Genesis_v3",
+ADAPT_Genesis <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="Genesis_v3",
                            col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_Intrahealth <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="IntraHealth_v3",
+ADAPT_Intrahealth <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="IntraHealth_v3",
                         col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_ReAction <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="ReAction!_v3",
+ADAPT_ReAction <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="ReAction!_v3",
                             col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_Anova <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="ANOVA_v3",
+ADAPT_Anova <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="ANOVA_v3",
                             col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_PulseHealth <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="PulseHealth_v3",
+ADAPT_PulseHealth <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="PulseHealth_v3",
                          col_types="c") %>% 
   rename(Sub=Partner)
 
 
- ADAPT_WDED <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="WDED_v3",
+ ADAPT_WDED <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="WDED_v3",
                                col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_KI <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="Khethimpilo_v3",
+ADAPT_KI <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="Khethimpilo_v3",
                         col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_HST <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="HST_v3",
+ADAPT_HST <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="HST_v3",
                       col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_THINK <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="THINK_v3",
+ADAPT_THINK <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="THINK_v3",
                           col_types="c") %>% 
   rename(Sub=Partner)
 
 
-ADAPT_BR <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="BRHC_v3",
+ADAPT_BR <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="BRHC_v3",
                          col_types="c") %>% 
   rename(Sub=Partner)
 
-ADAPT_SHF <-read_sheet(as_sheets_id('1fsbtskAYLXmqrAcZts2tR8Kg19JZPmRgXEmYzB3yYpw'), sheet="SHF_v3",
+ADAPT_SHF <-read_sheet(as_sheets_id('1WOINIrcYw6DY8CNWKKz7MhvM1qqj0RLvvFxgFie5zeY'), sheet="SHF_v3",
                       col_types="c") %>% 
   rename(Sub=Partner)
 
@@ -165,7 +166,7 @@ numeric<- PARTNER_TOOLS %>%
 
 
 # PULL HIERARCHY 
-hierarchy<-pull_hierarchy("cDGPF739ZZr", myuser, askpass::askpass()) %>%
+hierarchy<-Wavelength::pull_hierarchy("cDGPF739ZZr", myuser, askpass::askpass()) %>%
   mutate(facility=str_sub(orgunit,4)) %>%
   select(snu1,psnu,psnuuid) %>% 
   distinct(snu1,psnu,psnuuid) %>% 
@@ -187,8 +188,7 @@ arpa<-numeric %>%
     partner=="Guidehouse" ~ "18321",
     partner=="Right to Care" ~ "ADAPT",
     TRUE ~ ""
-  )) %>% 
-  mutate(period=quarter(date, with_year = TRUE, fiscal_start = 10),
+  )) %>%   mutate(period=lubridate::quarter(date, with_year = TRUE, fiscal_start = 10),
          period=stringr::str_remove(period, "20"),
          period=str_replace_all(period,"\\.","Q"),
          period=paste0("FY",period),
@@ -239,7 +239,6 @@ indicator_names<-arpa %>%
     TRUE ~ indicator_clean
   ))
 
-
 # MAKE INDICATOR KEY IN HISTORIC FOR JOINING
 historic<-historic %>% 
   unite(ind_key,historic_indicator_code,numeratordenom,sep="_",remove=FALSE) %>% 
@@ -281,14 +280,14 @@ final_df<-arpa_combined %>%
   bind_rows(arpa_combined) %>% 
   mutate(indicator2=indicator,
          value2=value) %>%
-  spread(indicator2,value2) 
+  spread(indicator2,value2) %>% mutate(mon_yr= gsub(" ","",paste(mon_yr,"-01")))
 
 
 
 ind<-distinct(final_df,historic_indicator_code,indicator,numeratordenom)
 
 # EXPORT
-filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.0.csv",sep="_")
+filename<-paste(current_mo_full,"Data_USAID_ARPA_GVAX_COMBINED_v1.3.csv",sep="_")
 
 
 write_csv(final_df, file.path(here("Dataout"),filename),na="")
